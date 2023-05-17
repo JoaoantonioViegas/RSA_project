@@ -121,20 +121,6 @@ def main():
         # wait 0.1 seconds
         time.sleep(0.2)
 
-        
-
-
-
-    # while True:
-    #     move_car_forward()
-    #     message = construct_message()
-    #     publish_message(message)
-    #     print("Car is at: ", car.y)
-    #     time.sleep(0.1)
-    #     if car.y > 40:
-    #         print("Car is at: ", car.y)
-    #     if car.y>= 100:
-    #         break
 
 if __name__ == "__main__":
     main()

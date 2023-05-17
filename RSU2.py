@@ -1,38 +1,37 @@
+import paho.mqtt.client as mqtt
+import time
+import json
+import random
+from geopy.distance import distance
+from termcolor import colored
 
-coordinates = {
-    "coord1": (40.636878, -8.647755),
-    "coord2": (40.636857, -8.647739),
-    "coord3": (40.636804, -8.647680),
-    "coord4": (40.636804, -8.647680),
-    "coord5": (40.636772, -8.647631),
-    "coord6": (40.636723, -8.647588),
-    "coord7": (40.636701, -8.647553),
-    "coord8": (40.636672, -8.647512),
-    "coord9": (40.636646, -8.647475),
-    "coord10": (40.636594, -8.647411),
-    "coord11": (40.636559, -8.647372),
-    "coord12": (40.636522, -8.647324),
-    "coord13": (40.636501, -8.647295),
-    "coord14": (40.636456, -8.647244),
-    "coord15": (40.636426, -8.647212),
-    "coord16": (40.636399, -8.647177),
-    "coord17": (40.636371, -8.647142),
-    "coord18": (40.636340, -8.647113),
-    "coord19": (40.636306, -8.647078),
-    "coord20": (40.636275, -8.647038),
-    "coord21": (40.636240, -8.646997),
-    "coord22": (40.636214, -8.646960),
-    "coord23": (40.636188, -8.646933),
-    "coord24": (40.636157, -8.646895),
-    "coord25": (40.636131, -8.646863),
-    "coord26": (40.636098, -8.646834),
-    "coord27": (40.636074, -8.646799),
-    "coord28": (40.636041, -8.646756),
-    "coord29": (40.636021, -8.646713),
-    "coord30": (40.635994, -8.646686),
-    "coord31": (40.635974, -8.646654)
-}
 
-# print(coordinates["coordX"])
-for i in range(1, 32):
-    print(coordinates["coord" + str(i)])
+class post:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+post = post(40.63605, -8.64657)
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    client.subscribe("vanetza/out/lsm")
+
+def on_message(client, userdata, msg):
+    msg = json.loads(msg.payload)
+    print(msg)
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect("192.168.98.20", 1883, 60)
+client.loop_start()
+
+def main():
+    print("Starting RSU2")
+    while True:
+        time.sleep(1)
+
+if __name__ == "__main__":
+    main()
+

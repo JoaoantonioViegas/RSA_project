@@ -21,6 +21,14 @@ turn_light_on_message = {
     "stationID": 1,
 }
 
+syncronize_message = {
+    "syncronize": "on",
+    "ordering_status": "on",
+    "longitude": post.y,
+    "latitude": post.x,
+    "stationID": 1,
+}
+
 # Falta fazer a gaita para descobrir em que estado esta o poste
 MY_STATUS = "off"
 
@@ -48,6 +56,7 @@ def on_message(client, userdata, msg):
     if distance_between_car_and_post < 20 and MY_STATUS == "off":
         print(colored("Turning on the light ", "magenta"))
         MY_STATUS = "on"
+        syncronize(json.dumps(turn_light_on_message))
 
     elif distance_between_car_and_post > 20 and MY_STATUS == "on":
         print(colored("Turning off the light ", "magenta"))
@@ -75,10 +84,13 @@ def public_message(message):
     client.publish("vanetza/out/lsm", message) #lsm = light support message
     print("Message published")
 
+def syncronize(message):
+    client.publish("vanetza/out/sync", message)
+    print("Syncronize message published")
 
 
 def main():
-    print("Starting OBU1")
+    print("Starting RSU1")
     while True:
         time.sleep(1)
 

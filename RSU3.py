@@ -10,8 +10,10 @@ class post:
         self.x = x
         self.y = y
 
-
-post = post(40.63605, -8.64657)
+post1 = post(40.636028, -8.646669)
+post2 = post(40.635986, -8.646732)
+post = post(40.635995, -8.646634)
+pair_post = post(40.635953, -8.646696)
 
 turn_light_on_message = {
     "my_status": "on",

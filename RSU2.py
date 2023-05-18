@@ -11,7 +11,10 @@ class post:
         self.x = x
         self.y = y
 
-post = post(40.63605, -8.64657)
+post = post(40.635986, -8.646732)
+pair_post = post(40.636028, -8.646669)
+post3 = post(40.635995, -8.646634)
+post4 = post(40.635953, -8.646696)
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))

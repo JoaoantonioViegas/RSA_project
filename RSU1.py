@@ -42,7 +42,6 @@ syncronize_message = {
 }
 syncronize_message = json.dumps(syncronize_message)
 
-# Falta fazer a gaita para descobrir em que estado esta o poste
 MY_STATUS = "off"
 
 

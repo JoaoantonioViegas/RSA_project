@@ -88,7 +88,7 @@ def construct_message(latitude,longtitude):
             "embarkationStatus": False
         }
     },
-    "speed": 16383,
+    "speed": 60,
     "speedConf": 127,
     "speedLimiter": True,
     "stationID": 1,

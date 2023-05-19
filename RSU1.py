@@ -13,9 +13,9 @@ class post:
 
 # post = post(20, 60)
 post = post(40.636028, -8.646669)
-pair_post = post(40.635986, -8.646732)
-post3 = post(40.635995, -8.646634)
-post4 = post(40.635953, -8.646696)
+# pair_post = post(40.635986, -8.646732)
+# post3 = post(40.635995, -8.646634)
+# post4 = post(40.635953, -8.646696)
 
 turn_light_on_message = {
     "my_status": "on",
@@ -28,11 +28,17 @@ turn_light_on_message = json.dumps(turn_light_on_message)
 
 
 syncronize_message = {
-    "syncronize": "on",
-    "ordering_status": "on",
-    "longitude": post.y,
-    "latitude": post.x,
-    "stationID": 1,
+   "status":"on",
+   "percentage":20,
+   "longitude":post.y,
+   "latitude":post.x,
+   "stationID":35,
+   "ordering_status":"on",
+   "ordering_percentage":20,
+   "ordering_interval":4000,
+   "radius":30,
+   "timestamp":"yyyymmddhhmmss",
+   "sequence_number":10,
 }
 syncronize_message = json.dumps(syncronize_message)
 
@@ -48,7 +54,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     global MY_STATUS
 
-    print(msg.topic+" "+str(msg.payload))
+    # print(msg.topic+" "+str(msg.payload))
 
     message = json.loads(msg.payload)
 
@@ -57,32 +63,27 @@ def on_message(client, userdata, msg):
 
     latitude = message["latitude"]
 
+    velocity = message["speed"]
+
     distance_between_car_and_post = distance((latitude, longitude), (post.x, post.y)).meters
 
     print("Distance between car and post: ", distance_between_car_and_post)
 
     print("My status: ", MY_STATUS)
 
-    if distance_between_car_and_post < 20 and MY_STATUS == "off":
+    iluminacao = calc_iluminacao(distance_between_car_and_post,velocity)
+
+    if iluminacao > 20 and MY_STATUS == "off":
         MY_STATUS = "on"
         print(colored("Turning on the light ", "magenta"))
         syncronize(syncronize_message)
-
-    elif distance_between_car_and_post > 20 and MY_STATUS == "on":
+    
+    elif iluminacao < 20 and MY_STATUS == "on":
         print(colored("Turning off the light ", "magenta"))
         MY_STATUS = "off"
 
-    elif distance_between_car_and_post >10 and MY_STATUS == "on":
-        print(colored("Sending message to the post","cyan"))
-        public_message(json.dumps(turn_light_on_message))
+    print(colored("Iluminacao: ", "green"), iluminacao,distance_between_car_and_post,velocity)  
 
-    if distance_between_car_and_post < 20 and distance_between_car_and_post > 0 and MY_STATUS == "on":
-        # print with another color 
-        print(colored("CAR is at: ", "green"),latitude,longitude)
-        print(colored("Light is on ", "yellow"))
-        
-    else:
-        print(colored("CAR is at: ", "red"), latitude, longitude)
 
 client = mqtt.Client()
 client.on_connect = on_connect
@@ -101,7 +102,7 @@ def public_message(message):
     print("Message to next post published")
 
 def syncronize(message):
-    client.publish("vanetza/out/sync/1", message)
+    client.publish("vanetza/out/lsm", message)
     print("Syncronize message published")
 
 def calc_iluminacao(distancia, velocidade):

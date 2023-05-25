@@ -1,8 +1,8 @@
 {
-    "station_id": 1,
-    "station_latitude": 1.0,
-    "station_longitude": 1.0,
-    "dest_stations": [2,3],
-    "intensity":40,
+    "station_id": -1,
+    "station_latitude": -1.0,
+    "station_longitude": -1.0,
+    "dest_stations": {"-1":-1},
+    "intensity":-1,
     "timestamp": "2019-01-01 00:00:00:0"
 }

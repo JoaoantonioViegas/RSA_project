@@ -43,18 +43,27 @@ def calculate_initial_compass_bearing(pointA, pointB):
 
     return compass_bearing
 
-def get_coordinates(lat1, lon1, lat2, lon2, N):
+def get_coordinates(lat1, lon1, lat2, lon2, speed):
     start = Point(latitude=lat1, longitude=lon1)
     end = Point(latitude=lat2, longitude=lon2)
-    distance = geodesic(start, end).miles
-    step = distance / N
+    distance = geodesic(start, end).kilometers
+    distance_meters = distance * 1000
+    speedms = speed * 0.277778
+    #how many seconds it takes to travel the distance_meters at speedms
+    seconds = distance_meters / speedms
+    #how many times the message should be sent per second
+    N = 10
+    #how many samples to take
+    samples = int(seconds * N)
+    #step size in meters
+    step = distance_meters / samples
 
     bearing = calculate_initial_compass_bearing((lat1, lon1), (lat2, lon2))
 
     coordinates = []
-    for i in range(N+1):
+    for i in range(samples+1):
         step_distance = step * i
-        step_point = geodesic(miles=step_distance).destination(point=start, bearing=bearing)
+        step_point = geodesic(meters=step_distance).destination(point=start, bearing=bearing)
         #round to only 6 decimal places after the point
         step_point.latitude = round(step_point.latitude, 6)
         step_point.longitude = round(step_point.longitude, 6)
@@ -83,7 +92,7 @@ def travel(street_list, speed_list, delay):
         for key, coord in street.items():
             message = construct_message(coord[0], coord[1], speed_list[j])
             publish_message(message)
-            print(colored("latitude: " + str(coord[0]) + " longitude: " + str(coord[1]) + " speed: " + str(speed_list[j]*3.6),"green"))
+            print(colored("latitude: " + str(coord[0]) + " longitude: " + str(coord[1]) + " speed: " + str(speed_list[j]) +" km/h","green"))
             time.sleep(delay)
         j += 1
         print("\n")
@@ -96,13 +105,15 @@ def publish_message(message):
     # print(message)
     client.publish("vanetza/in/cam", message)
 
-av_25_abril_1 = [(40.638058, -8.649246), (40.636935, -8.647825), 87]
-av_25_abril_2 = [(40.636935, -8.647825), (40.636039, -8.646736),68]
-av_25_abril_3 = [(40.636039, -8.646736), (40.634814, -8.645164),100]
-av_oita_1 = [(40.636731, -8.645732), (40.636039, -8.646736),20]
-av_oita_2 = [(40.636039, -8.646736), (40.635453, -8.647562),18]
-r_neves_1 = [(40.637832, -8.646591), (40.636935, -8.647825),20]
-r_neves_2 = [(40.636935, -8.647825), (40.636576, -8.648289),10]
+#street = [(start.x, start.y), (end.x, end.y), speed in km/h]
+
+av_25_abril_1 = [(40.638058, -8.649246), (40.636935, -8.647825), 55]
+av_25_abril_2 = [(40.636935, -8.647825), (40.636039, -8.646736), 50]
+av_25_abril_3 = [(40.636039, -8.646736), (40.634814, -8.645164), 55]
+av_oita_1 = [(40.636731, -8.645732), (40.636039, -8.646736), 40]
+av_oita_2 = [(40.636039, -8.646736), (40.635453, -8.647562), 45]
+r_neves_1 = [(40.637832, -8.646591), (40.636935, -8.647825), 30]
+r_neves_2 = [(40.636935, -8.647825), (40.636576, -8.648289), 30]
 av_25_abril_1_street = coordinates_to_dict(get_coordinates(av_25_abril_1[0][0], av_25_abril_1[0][1], av_25_abril_1[1][0], av_25_abril_1[1][1], av_25_abril_1[2]))
 av_25_abril_2_street = coordinates_to_dict(get_coordinates(av_25_abril_2[0][0], av_25_abril_2[0][1], av_25_abril_2[1][0], av_25_abril_2[1][1], av_25_abril_2[2]))
 av_25_abril_3_street = coordinates_to_dict(get_coordinates(av_25_abril_3[0][0], av_25_abril_3[0][1], av_25_abril_3[1][0], av_25_abril_3[1][1], av_25_abril_3[2]))
@@ -114,7 +125,7 @@ r_neves_2_street = coordinates_to_dict(get_coordinates(r_neves_2[0][0], r_neves_
 # create a main function that will run the program
 def main():
     path = [av_25_abril_1_street, av_25_abril_2_street, av_25_abril_3_street]
-    speed = [70, 71, 69]
+    speed = [55, 50, 55]
     while True:
         #main street with average speed of 50km/h and resolution of 10Hz
         travel(path, speed, 0.1)

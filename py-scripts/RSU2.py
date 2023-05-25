@@ -1,9 +1,10 @@
 import paho.mqtt.client as mqtt
 import time
 import json
-import random
+import math as Math
 from geopy.distance import distance
 from termcolor import colored
+from datetime import datetime
 
 
 class post:
@@ -11,34 +12,60 @@ class post:
         self.x = x
         self.y = y
 
-post = post(40.635986, -8.646732)
-# pair_post = post(40.636028, -8.646669)
-# post3 = post(40.635995, -8.646634)
-# post4 = post(40.635953, -8.646696)
-
-MY_STATUS = "off"
+post = post(40.635674, -8.646346)
+ID = 2
+MY_STATUS = "dimmed"
+MY_INTENSITY = 20
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     client.subscribe("vanetza/out/lsm")
 
 def on_message(client, userdata, msg):
-    global MY_STATUS
+    global MY_INTENSITY
     msg = json.loads(msg.payload)
-    print(msg)
-    longitude = msg["longitude"]
-    latitude = msg["latitude"]
-    stationID = msg["stationID"]
-    percentage = msg["ordering_percentage"]
-    distance_between_posts = distance((post.x, post.y), (latitude, longitude)).meters
-    print(colored("Distance between posts: " + str(distance_between_posts), "red"))
-    if distance_between_posts < 30:
-        MY_STATUS = "on"
-        print(colored("I'm turning on the light with: " + str(percentage)+"% of brightness", "green"))
+    times = msg["dest_stations"]
+    dest_stations = list(times.keys())
+    dest_stations = [int(i) for i in dest_stations]
+    if ID in dest_stations:
+        tempo = times[str(ID)]
+        print(colored("Tempo: ", "yellow"), colored(tempo, "yellow"))
+        MY_INTENSITY = calc_iluminacao(tempo, 3)
+        print(colored("Iluminacao: ", "yellow"), colored(MY_INTENSITY, "yellow")) 
+        message = construct_message({}, MY_INTENSITY, tempo)
+        publish_lsm(message)
     
-    if MY_STATUS == "on" and distance_between_posts > 30:
-        MY_STATUS = "off"
-        print(colored("I'm turning off the light", "yellow"))
+def construct_message(destination, intensity, tempo):
+    f = open('./out_lsm.json')
+    m = json.load(f)
+    m["dest_stations"] = destination
+    m["intensity"] = intensity
+    m["station_id"] = ID
+    m["station_latitude"] = post.x
+    m["station_longitude"] = post.y
+    # m["time_to_arrival"] = tempo
+    now = datetime.now()
+    m["timestamp"] = now.strftime("%Y-%m-%d %H:%M:%S:%f")
+    m = json.dumps(m)
+    return m
+
+def publish_lsm(message):
+    client.publish("vanetza/out/lsm", message) #lsm = light support message
+    print("LSM published")
+
+def calc_iluminacao(tempo, bias):
+    # if(not facing_post):
+    #    bias = 2
+    luminosidade = 1/tempo*100*bias
+
+    if luminosidade > 100:
+        luminosidade = 100
+
+    if luminosidade <20:
+        luminosidade = 20
+    
+    return Math.ceil(luminosidade)
+
 
 client = mqtt.Client()
 client.on_connect = on_connect

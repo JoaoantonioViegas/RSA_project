@@ -14,7 +14,13 @@ class post:
         self.y = y
 
 ID = 1
-post = post(40.636028, -8.646669)
+post = post(40.636032, -8.646632)
+
+LAMPS = {
+    1: [40.636032, -8.646632],
+    2: [40.635674, -8.646346],
+    3: [40.636274, -8.647093],
+}
 
 turn_light_on_message = {
     "my_status": "on",
@@ -43,6 +49,7 @@ syncronize_message = json.dumps(syncronize_message)
 
 MY_STATUS = "dimmed"
 MY_INTENSITY = 20
+RADIUS = 100
 
 last_3_distances = []
 
@@ -57,7 +64,8 @@ def on_connectRsu(client, userdata, flags, rc):
 
 
 def on_messageRsu(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
+    message = json.loads(msg.payload)
+    # print(msg.topic+" "+str(msg.payload))
 
 def on_messageObu(client, userdata, msg):
     global MY_STATUS, MY_INTENSITY
@@ -89,7 +97,11 @@ def on_messageObu(client, userdata, msg):
     else:
         print(colored("My status: ", "red"), colored(MY_STATUS, "red"))
 
-    iluminacao = calc_iluminacao(distance_between_car_and_post,velocity, 2.5, facing)
+    time_to_arrival = [round(calc_interval(distance_between_car_and_post, velocity),2)]
+    print(colored("Time to arrival: ", "green"), time_to_arrival)
+    # if(not facing):
+    #     time_to_arrival = 0
+    iluminacao = calc_iluminacao(distance_between_car_and_post,velocity, 3, facing)
     MY_INTENSITY = iluminacao
 
     if iluminacao > 20 and MY_STATUS == "dimmed":
@@ -100,16 +112,22 @@ def on_messageObu(client, userdata, msg):
 
     print(colored("Iluminacao: ", "yellow"), colored(iluminacao, "yellow"))  
     print("\n")
+
+    target_ids = get_post_ids()
+    times = get_times_to_arrival(target_ids, latitude, longitude, velocity)
+    out_message = construct_message([2], MY_INTENSITY, times)
+    publish_lsm(out_message)
     
 def publish_lsm(message):
     clientRsu.publish("vanetza/out/lsm", message) #lsm = light support message
+    print(message)
     print("LSM published")
 
 
 def calc_iluminacao(distance, speed, bias, facing_post):
     tempo = calc_interval(distance, speed)
-    if(not facing_post):
-       bias = 1
+    # if(not facing_post):
+    #    bias = 2
     luminosidade = 1/tempo*100*bias
 
     if luminosidade > 100:
@@ -129,7 +147,6 @@ def calc_interval(distance, speed):
 
     # Calcular o tempo em segundos
     tempo = distance / speed_ms
-    print("Tempo: ", round(tempo,1), "s")
     return tempo
 
 def facing_post(last_3_distances):
@@ -138,15 +155,39 @@ def facing_post(last_3_distances):
             return True
     return False
 
-def construct_message(destination, intensity):
+def construct_message(destination, intensity, times):
     f = open('./out_lsm.json')
     m = json.load(f)
-    m["dest_stations"] = destination
+    m["dest_stations"] = times
     m["intensity"] = intensity
+    m["station_id"] = ID
+    m["station_latitude"] = post.x
+    m["station_longitude"] = post.y
+    # m["time_to_arrival"] = time_to_arrival
     now = datetime.now()
     m["timestamp"] = now.strftime("%Y-%m-%d %H:%M:%S:%f")
     m = json.dumps(m)
     return m
+
+def get_post_ids():
+    global LAMPS
+    ids = []
+    for key, value in LAMPS.items():
+        # if(post.x != value[0] and post.y != value[1]):
+            #check if lamp is within radius
+        if distance((post.x, post.y), (value[0], value[1])).meters < RADIUS:
+            ids.append(key)
+    return ids
+
+def get_times_to_arrival(ids, car_latitude, car_longitude, car_speed):
+    global LAMPS
+    times = {}
+    for id in ids:
+        distance_between_car_and_post = round(distance((car_latitude, car_longitude), (LAMPS[id][0], LAMPS[id][1])).meters,2)
+        time_to_arrival = round(calc_interval(distance_between_car_and_post, car_speed),2)
+        times[id] = time_to_arrival
+    return times
+
 
 clientObu = mqtt.Client()
 clientObu.on_connect = on_connectObu
@@ -164,9 +205,6 @@ threading.Thread(target=clientRsu.loop_forever).start()
 def main():
     print("Starting RSU1")
     while True:
-        #alert other RSUs
-        out_message = construct_message([2,3,4], MY_INTENSITY)
-        publish_lsm(out_message)
         time.sleep(1)
 
 if __name__ == "__main__":

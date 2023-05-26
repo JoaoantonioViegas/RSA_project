@@ -1,0 +1,17 @@
+{
+    "1": {
+        "Latitude": -8.646669,
+        "Longitude": -8.646669,
+        "Status": "Off"
+    }, 
+    "2": {
+        "Latitude": 40.635986,
+        "Longitude": -8.646732,
+        "Status": "Off"
+    },
+    "3": {
+        "Latitude": 40.635995,
+        "Longitude": -8.646634,
+        "Status": "Off"
+    }
+}

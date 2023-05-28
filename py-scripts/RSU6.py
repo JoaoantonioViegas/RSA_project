@@ -13,9 +13,9 @@ class post:
         self.x = x
         self.y = y
 
-ID = 1
-post = post(40.636032, -8.646632)
-BIAS = 2.8
+ID = 6
+post = post(40.635727, -8.647118)
+BIAS = 2.8   
 LAMPS = {}
 
 
@@ -66,7 +66,6 @@ def on_connectObu(client, userdata, flags, rc):
 def on_connectRsu(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     client.subscribe("all/lsm")
-    
 
 
 def on_messageRsu(client, userdata, msg):
@@ -137,7 +136,7 @@ def on_messageObu(client, userdata, msg):
 def publish_lsm(message):
     clientRsu.publish("all/lsm", message) #lsm = light support message
     print(message)
-    print("LSM published")
+    print("LSM published on all/lsm")
 
 
 def calc_iluminacao(distance, speed, bias, facing_post):
@@ -231,7 +230,7 @@ def get_intensities(times, bias):
 clientObu = mqtt.Client()
 clientObu.on_connect = on_connectObu
 clientObu.on_message = on_messageObu
-clientObu.connect("192.168.98.20", 1883, 60)
+clientObu.connect("192.168.98.60", 1883, 60)
 threading.Thread(target=clientObu.loop_forever).start()
 
 clientRsu = mqtt.Client()
@@ -248,7 +247,7 @@ threading.Thread(target=clientLamps.loop_forever).start()
 
 
 def main():
-    print("Starting RSU1")
+    print("Starting RSU6")
     while True:
         time.sleep(1)
 

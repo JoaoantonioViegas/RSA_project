@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { MapContainer, TileLayer } from 'react-leaflet'
-import { Marker, Popup } from 'react-leaflet'
+import { Marker, Popup, Circle } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import './Home.css'
 import L from 'leaflet'
@@ -10,6 +10,10 @@ function Home() {
   const [carPos, setCarPos] = useState([40.636500, -8.647291])
   const [speed, setSpeed] = useState(0)
   const [lampData, setLampData] = useState({})
+
+  const circleRadius = 80; // meters
+  const circleColor = 'red';
+  const circleOpacity = 0.3;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -35,7 +39,7 @@ function Home() {
 
   const carIcon = new L.Icon({
     iconUrl: require('../assets/car.png'),
-    iconSize: new L.Point(70, 70),
+    iconSize: new L.Point(50, 50),
     className: 'car-icon'
   })
 
@@ -152,11 +156,17 @@ function Home() {
             Speed: {speed} km/h
           </Popup>
         </Marker>
+        <Circle
+        center={carPos}
+        radius={circleRadius}
+        color={circleColor}
+        fillOpacity={circleOpacity}
+      />
         {Object.keys(lampData).map((key, index) => (
           <Marker key={index} position={[lampData[key].lat + 0.00005, lampData[key].lon+0.00002]} icon={getIconFromIntensity(lampData[key].intensity)}>
             <Popup>
               <b>Smart Lamp</b><br/>
-              <b>Id:</b> {lampData[key].id}<br/>
+              <b>Id:</b> {key}<br/>
               <b>Intensity:</b> {lampData[key].intensity}<br/>
             </Popup>
           </Marker>

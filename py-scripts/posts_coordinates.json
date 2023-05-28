@@ -1,0 +1,118 @@
+{
+    "1": {
+        "Latitude": 40.636032,
+        "Longitude": -8.646632,
+        "Status": "On",
+        "RSU": true
+    }, 
+    "2": {
+        "Latitude": 40.635939,
+        "Longitude": -8.646695,
+        "Status": "On",
+        "RSU": false
+    },
+    "3": {
+        "Latitude": 40.636095,
+        "Longitude": -8.646893,
+        "Status": "On",
+        "RSU": false
+    },
+    "4": {
+        "Latitude": 40.636454, 
+        "Longitude": -8.647312,
+        "Status": "On",
+        "RSU": false
+    },
+    "5": {
+        "Latitude": 40.635648,  
+        "Longitude": -8.646314,
+        "Status": "On",
+        "RSU": false
+    },
+
+    "6": {
+        "Latitude": 40.635727,   
+        "Longitude": -8.647118,
+        "Status": "On",
+        "RSU": true
+    },
+    "7": {
+        "Latitude": 40.635802,   
+        "Longitude": -8.647199,
+        "Status": "On",
+        "RSU": false
+    },
+    "8": {
+        "Latitude": 40.636169, 
+        "Longitude": -8.647692,
+        "Status": "On",
+        "RSU": false
+    },
+
+    "9": {
+        "Latitude": 40.636570, 
+        "Longitude": -8.648376,
+        "Status": "On",
+        "RSU": false
+    },
+    "10": {
+        "Latitude": 40.636584,  
+        "Longitude": -8.648210,
+        "Status": "On",
+        "RSU": true
+    },
+
+    "11": {
+        "Latitude": 40.636991,  
+        "Longitude": -8.647816, 
+        "Status": "On",
+        "RSU": true
+    },
+    "12": {
+        "Latitude": 40.636855, 
+        "Longitude": -8.647819 , 
+        "Status": "On",
+        "RSU": false
+    },
+    
+    "13": {
+        "Latitude": 40.637100, 
+        "Longitude": -8.649072 , 
+        "Status": "On",
+        "RSU": true
+    },
+    "14": {
+        "Latitude": 40.637285,  
+        "Longitude": -8.648828 , 
+        "Status": "On",
+        "RSU": false
+    },
+
+    "15": {
+        "Latitude": 40.637318, 
+        "Longitude": -8.649641, 
+        "Status": "On",
+        "RSU": true
+    },
+
+    "16": {
+        "Latitude": 40.638006, 
+        "Longitude": -8.649255, 
+        "Status": "On",
+        "RSU": true
+    },
+
+    "17": {
+        "Latitude": 40.638118, 
+        "Longitude": -8.649236 , 
+        "Status": "On",
+        "RSU": false
+    },
+
+    "18": {
+        "Latitude": 40.637462, 
+        "Longitude": -8.648595 , 
+        "Status": "On",
+        "RSU": false
+    }
+}

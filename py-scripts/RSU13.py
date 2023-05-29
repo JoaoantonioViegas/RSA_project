@@ -13,10 +13,36 @@ class post:
         self.x = x
         self.y = y
 
-ID = 1
-post = post(40.636032, -8.646632)
-BIAS = 2.8
+ID = 11
+post = post(40.636991, -8.647816)
+BIAS = 2.8   
 LAMPS = {}
+
+
+turn_light_on_message = {
+    "my_status": "on",
+    "ordering_status": "on",
+    "longitude": post.y,
+    "latitude": post.x,
+    "stationID": 1,
+}
+turn_light_on_message = json.dumps(turn_light_on_message)
+
+
+syncronize_message = {
+   "status":"on",
+   "percentage":20,
+   "longitude":post.y,
+   "latitude":post.x,
+   "stationID":35,
+   "ordering_status":"on",
+   "ordering_percentage":20,
+   "ordering_interval":4000,
+   "radius":30,
+   "timestamp":"yyyymmddhhmmss",
+   "sequence_number":10,
+}
+syncronize_message = json.dumps(syncronize_message)
 
 MY_STATUS = "dimmed"
 MY_INTENSITY = 20
@@ -40,7 +66,6 @@ def on_connectObu(client, userdata, flags, rc):
 def on_connectRsu(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     client.subscribe("all/lsm")
-    
 
 
 def on_messageRsu(client, userdata, msg):
@@ -68,11 +93,8 @@ def on_messageObu(client, userdata, msg):
     velocity = message["speed"]
 
     distance_between_car_and_post = round(distance((latitude, longitude), (post.x, post.y)).meters,2)
-    if(distance_between_car_and_post > 70):
-        print(colored("Distance: ", "red"), colored(distance_between_car_and_post, "red"))
+    if(distance_between_car_and_post > 80):
         return
-    else:
-        print(colored("Distance: ", "green"), colored(distance_between_car_and_post, "green"))
 
     last_3_distances.append(distance_between_car_and_post)
     if len(last_3_distances) > 3:
@@ -114,7 +136,7 @@ def on_messageObu(client, userdata, msg):
 def publish_lsm(message):
     clientRsu.publish("all/lsm", message) #lsm = light support message
     print(message)
-    print("LSM published")
+    print("LSM published on all/lsm")
 
 
 def calc_iluminacao(distance, speed, bias, facing_post):
@@ -200,19 +222,16 @@ def intensity_on_time(tempo, bias):
 def get_intensities(times, bias):
     intensities = {}
     for key, value in times.items():
-        temp = intensity_on_time(value, bias)
-        if (temp > 20):
-            intensities[key] = temp
-        # intensities[key] = intensity_on_time(value, bias)
+        intensities[key] = intensity_on_time(value, bias)
     return intensities
 
 
 
-clientCams = mqtt.Client()
-clientCams.on_connect = on_connectObu
-clientCams.on_message = on_messageObu
-clientCams.connect("192.168.98.20", 1883, 60)
-threading.Thread(target=clientCams.loop_forever).start()
+clientObu = mqtt.Client()
+clientObu.on_connect = on_connectObu
+clientObu.on_message = on_messageObu
+clientObu.connect("192.168.98.110", 1883, 60)
+threading.Thread(target=clientObu.loop_forever).start()
 
 clientRsu = mqtt.Client()
 clientRsu.on_connect = on_connectRsu
@@ -228,7 +247,7 @@ threading.Thread(target=clientLamps.loop_forever).start()
 
 
 def main():
-    print("Starting RSU1")
+    print("Starting RSU6")
     while True:
         time.sleep(1)
 

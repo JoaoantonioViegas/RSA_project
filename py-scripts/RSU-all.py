@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import time
 from datetime import datetime
 import json
-import random
+import sys
 from geopy.distance import distance
 from termcolor import colored
 import math as Math
@@ -13,19 +13,38 @@ class post:
         self.x = x
         self.y = y
 
-ID = 1
-post = post(40.636032, -8.646632)
-BIAS = 2.8
+# ID = 11
+# post = post(40.636991, -8.647816)
+# BIAS = 2.8   
+
+
+#make sure the program is called with the correct number of arguments (6)
+if len(sys.argv) != 6:
+    print("Usage: python3 RSU.py <ID> <latitude> <longitude> <bias> <IP>")
+    sys.exit(1)
+
+#assign the arguments to variables
+ID = int(sys.argv[1])
+print(colored("ID: ", "magenta"), colored(ID, "magenta"))
+post.x = float(sys.argv[2])
+print(colored("post.x: ", "magenta"), colored(post.x, "magenta"))
+post.y = -float(sys.argv[3])
+print(colored("post.y: ", "magenta"), colored(post.y, "magenta"))
+BIAS = float(sys.argv[4])
+print(colored("BIAS: ", "magenta"), colored(BIAS, "magenta"))
+IP = sys.argv[5]
+print(colored("IP: ", "magenta"), colored(IP, "magenta"))
+post = post(post.x, post.y)
 LAMPS = {}
 
 MY_STATUS = "dimmed"
 MY_INTENSITY = 20
-RADIUS = 100
+RADIUS = 70
 
 last_3_distances = []
 
 def on_connectLamps(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
+    print(colored("Connected with result code: ", "green"), colored(str(rc), "green"))
     client.subscribe("posts_info")
 
 def on_messageLamps(client, userdata, msg):
@@ -34,13 +53,12 @@ def on_messageLamps(client, userdata, msg):
     LAMPS = message
 
 def on_connectObu(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
+    print(colored("Connected with result code: ", "green"), colored(str(rc), "green"))
     client.subscribe("vanetza/out/cam")
 
 def on_connectRsu(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
+    print(colored("Connected with result code: ", "green"), colored(str(rc), "green"))
     client.subscribe("all/lsm")
-    
 
 
 def on_messageRsu(client, userdata, msg):
@@ -68,11 +86,8 @@ def on_messageObu(client, userdata, msg):
     velocity = message["speed"]
 
     distance_between_car_and_post = round(distance((latitude, longitude), (post.x, post.y)).meters,2)
-    if(distance_between_car_and_post > 70):
-        print(colored("Distance: ", "red"), colored(distance_between_car_and_post, "red"))
+    if(distance_between_car_and_post > RADIUS):
         return
-    else:
-        print(colored("Distance: ", "green"), colored(distance_between_car_and_post, "green"))
 
     last_3_distances.append(distance_between_car_and_post)
     if len(last_3_distances) > 3:
@@ -114,7 +129,7 @@ def on_messageObu(client, userdata, msg):
 def publish_lsm(message):
     clientRsu.publish("all/lsm", message) #lsm = light support message
     print(message)
-    print("LSM published")
+    print("LSM published on all/lsm")
 
 
 def calc_iluminacao(distance, speed, bias, facing_post):
@@ -168,9 +183,6 @@ def get_post_ids():
         return []
     ids = []
     for key, value in LAMPS.items():
-        # if(post.x != value[0] and post.y != value[1]):
-            #check if lamp is within radius
-        # if distance((post.x, post.y), (value['Latitude'], value['Longitude'])).meters < RADIUS:
         ids.append(key)
     return ids
 
@@ -201,18 +213,17 @@ def get_intensities(times, bias):
     intensities = {}
     for key, value in times.items():
         temp = intensity_on_time(value, bias)
-        if (temp > 20):
+        if (temp >= 20):
             intensities[key] = temp
-        # intensities[key] = intensity_on_time(value, bias)
     return intensities
 
 
 
-clientCams = mqtt.Client()
-clientCams.on_connect = on_connectObu
-clientCams.on_message = on_messageObu
-clientCams.connect("192.168.98.20", 1883, 60)
-threading.Thread(target=clientCams.loop_forever).start()
+clientObu = mqtt.Client()
+clientObu.on_connect = on_connectObu
+clientObu.on_message = on_messageObu
+clientObu.connect(IP, 1883, 60)
+threading.Thread(target=clientObu.loop_forever).start()
 
 clientRsu = mqtt.Client()
 clientRsu.on_connect = on_connectRsu
@@ -228,7 +239,8 @@ threading.Thread(target=clientLamps.loop_forever).start()
 
 
 def main():
-    print("Starting RSU1")
+    time.sleep(0.5)
+    print("Starting RSU"+str(ID)+"...")
     while True:
         time.sleep(1)
 

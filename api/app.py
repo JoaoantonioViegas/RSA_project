@@ -52,9 +52,9 @@ def on_messagePosts(client, userdata, msg):
 
 def on_message(client, userdata, msg):
     global RSU_MESSAGE, POSTS_STATUS
-    print(colored("LSM message", "yellow"))
+    # print(colored("LSM message", "yellow"))
     message = json.loads(msg.payload)
-    print(message)
+    # print(message)
     RSU_MESSAGE = msg.payload
 
     id = message["station_id"]

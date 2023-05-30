@@ -6,6 +6,10 @@ python3 auxiliar.py > /dev/null 2>&1 &
 echo "Starting OBU1..."
 python3 OBU1.py > /dev/null 2>&1 &
 
+#OBU 2
+echo "Starting OBU2..."
+python3 OBU2.py > /dev/null 2>&1 &
+
 #RSU 1
 echo "Starting RSU1..."
 python3 RSU-all.py 1 40.636032 8.646632 2.8 '192.168.98.10' > /dev/null 2>&1 &

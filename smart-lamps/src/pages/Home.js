@@ -36,7 +36,7 @@ function Home() {
         const res = await fetch('http://localhost:5000/api/v1/rsu_data')
         const data = await res.json()
         setLampData(data)
-        // console.log(data)
+        console.log(data)
       }
       fetchCarPos()
       fetchLampData()
@@ -282,6 +282,8 @@ function Home() {
                 <b>Smart Lamp</b><br/>
                 <b>Id:</b> {key}<br/>
                 <b>Intensity:</b> {lampData[key].intensity}<br/>
+                <b>In Range:</b> {lampData[key].in_range ? 'Yes' : 'No'}<br/>
+                <b>Ordering RSU ID:</b> {lampData[key].ordering_rsu_id}<br/>
               </Popup>
             </Marker>
           ))}

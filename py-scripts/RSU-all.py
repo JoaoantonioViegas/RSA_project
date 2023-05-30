@@ -40,6 +40,8 @@ LAMPS = {}
 MY_STATUS = "dimmed"
 MY_INTENSITY = 20
 RADIUS = 70
+IN_RANGE = False
+ORDERING_RSU_ID = None
 
 last_3_distances = []
 
@@ -62,18 +64,21 @@ def on_connectRsu(client, userdata, flags, rc):
 
 
 def on_messageRsu(client, userdata, msg):
+    global MY_STATUS, MY_INTENSITY, BIAS, ORDERING_RSU_ID, last_3_distances
     message = json.loads(msg.payload)
     if(message["station_id"] == ID):
         return
+    ORDERING_RSU_ID = -1
     dest_stations = message["dest_stations"]
     for key, value in dest_stations.items():
         if key == str(ID):
             # if MY_INTENSITY < value:
             MY_INTENSITY = value
+            ORDERING_RSU_ID = message["station_id"]
             print(colored("Intensity received: ", "yellow"), colored(MY_INTENSITY, "yellow"))
 
 def on_messageObu(client, userdata, msg):
-    global MY_STATUS, MY_INTENSITY, BIAS
+    global MY_STATUS, MY_INTENSITY, BIAS, IN_RANGE
 
     # print(msg.topic+" "+str(msg.payload))
 
@@ -87,7 +92,9 @@ def on_messageObu(client, userdata, msg):
 
     distance_between_car_and_post = round(distance((latitude, longitude), (post.x, post.y)).meters,2)
     if(distance_between_car_and_post > RADIUS):
+        IN_RANGE = False
         return
+    IN_RANGE = True
 
     last_3_distances.append(distance_between_car_and_post)
     if len(last_3_distances) > 3:
@@ -130,6 +137,18 @@ def publish_lsm(message):
     clientRsu.publish("all/lsm", message) #lsm = light support message
     print(message)
     print("LSM published on all/lsm")
+
+def publish_status(intensity, in_range, ordering_rsu_id):
+    if in_range:
+        ordering_rsu_id = ID
+    message = {
+        "station_id": ID,
+        "intensity": intensity,
+        "in_range": in_range,
+        "ordering_rsu_id": ordering_rsu_id
+    }
+    clientRsu.publish("all/status", json.dumps(message))
+    print("Status published on all/status")
 
 
 def calc_iluminacao(distance, speed, bias, facing_post):
@@ -242,7 +261,8 @@ def main():
     time.sleep(0.5)
     print("Starting RSU"+str(ID)+"...")
     while True:
-        time.sleep(1)
+        publish_status(MY_INTENSITY, IN_RANGE, ORDERING_RSU_ID)
+        time.sleep(0.2)
 
 if __name__ == "__main__":
     main()

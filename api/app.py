@@ -26,15 +26,27 @@ def on_messageObu(client, userdata, msg):
     # print(message)
     OBU_MESSAGE = msg.payload
 
-def on_connect(client, userdata, flags, rc):
+def on_connectStatus(client, userdata, flags, rc):
     print("Connected to rsus with result code "+str(rc))
-    client.subscribe("all/lsm")
+    client.subscribe("all/status")
 
-def on_connectPosts(client, userdata, flags, rc):
+def on_messageStatus(client, userdata, msg):
+    global POSTS_STATUS
+    message = json.loads(msg.payload)
+    id = str(message['station_id'])
+    if id not in POSTS_STATUS:
+        POSTS_STATUS[id] = {}
+
+    POSTS_STATUS[id]['ordering_rsu_id'] = message['ordering_rsu_id']
+    POSTS_STATUS[id]['in_range'] = message['in_range']
+
+
+
+def on_connectPostsAux(client, userdata, flags, rc):
     print("Connected to posts with result code "+str(rc))
     client.subscribe("posts_info")
 
-def on_messagePosts(client, userdata, msg):
+def on_messagePostsAux(client, userdata, msg):
     global POSTS_STATUS
     message = json.loads(msg.payload)
     for key, value in message.items():
@@ -48,25 +60,38 @@ def on_messagePosts(client, userdata, msg):
         #check if POSTS_STATUS has intensity
         if 'intensity' not in POSTS_STATUS[key]:
             POSTS_STATUS[key]['intensity'] = 20 
+        if 'in_range' not in POSTS_STATUS[key]:
+            POSTS_STATUS[key]['in_range'] = False
+        if 'ordering_rsu_id' not in POSTS_STATUS[key]:
+            POSTS_STATUS[key]['ordering_rsu_id'] = -1
 
+    # print(POSTS_STATUS)
 
-def on_message(client, userdata, msg):
+def on_connectLSM(client, userdata, flags, rc):
+    print("Connected to rsus with result code "+str(rc))
+    client.subscribe("all/lsm")
+
+def on_messageLSM(client, userdata, msg):
     global RSU_MESSAGE, POSTS_STATUS
     # print(colored("LSM message", "yellow"))
     message = json.loads(msg.payload)
     # print(message)
     RSU_MESSAGE = msg.payload
 
-    id = message["station_id"]
+    id = str(message["station_id"])
+    if id not in POSTS_STATUS:
+        POSTS_STATUS[id] = {}
     lat = message["station_latitude"]
     lon = message["station_longitude"]
     intensity = message["intensity"]
     dest_stations = message["dest_stations"]
 
-    # print(POSTS_STATUS)
     if POSTS_STATUS != {}:
         for key, value in dest_stations.items():
+            if key not in POSTS_STATUS:
+                POSTS_STATUS[str(key)] = {}
             POSTS_STATUS[key]['intensity'] = value
+            POSTS_STATUS[key]['ordering_rsu_id'] = int(id)
     
 
 #connect to obu
@@ -78,20 +103,28 @@ clientObu.connect("192.168.98.20", 1883, 60)
 threading.Thread(target=clientObu.loop_forever).start()
 
 #rsus broker
-clientLocal = mqtt.Client()
-clientLocal.on_connect = on_connect
-clientLocal.on_message = on_message
-clientLocal.connect("192.168.98.1", 1883, 60)
+clientStatus = mqtt.Client()
+clientStatus.on_connect = on_connectStatus
+clientStatus.on_message = on_messageStatus
+clientStatus.connect("192.168.98.1", 1883, 60)
 
-threading.Thread(target=clientLocal.loop_forever).start()
+threading.Thread(target=clientStatus.loop_forever).start()
 
 #posts broker
-clientPosts = mqtt.Client()
-clientPosts.on_connect = on_connectPosts
-clientPosts.on_message = on_messagePosts
-clientPosts.connect("192.168.98.1")
+clientPostsAux = mqtt.Client()
+clientPostsAux.on_connect = on_connectPostsAux
+clientPostsAux.on_message = on_messagePostsAux
+clientPostsAux.connect("192.168.98.1")
 
-threading.Thread(target=clientPosts.loop_forever).start()
+threading.Thread(target=clientPostsAux.loop_forever).start()
+
+#LSM broker
+clientLSM = mqtt.Client()
+clientLSM.on_connect = on_connectLSM
+clientLSM.on_message = on_messageLSM
+clientLSM.connect("192.168.98.1")
+
+threading.Thread(target=clientLSM.loop_forever).start()
 
 
 @app.route('/')
@@ -101,6 +134,7 @@ def hello_world():
 @app.route('/api/v1/obu', methods=['GET'])
 def get_obu():
     global OBU_MESSAGE
+    # print(OBU_MESSAGE)
     return OBU_MESSAGE, 200
 
 @app.route('/api/v1/rsu_data', methods=['GET'])

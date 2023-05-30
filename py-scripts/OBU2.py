@@ -8,6 +8,7 @@ import math
 from termcolor import colored
 import threading
 
+ID=2
 
 def calculate_initial_compass_bearing(pointA, pointB):
     if (type(pointA) != tuple) or (type(pointB) != tuple):
@@ -78,7 +79,7 @@ def travel(street_list, speed_list, delay):
 client = mqtt.Client()
 # client.on_connect = on_connect
 # client.on_message = on_message
-client.connect("192.168.98.10", 1883, 60)
+client.connect("192.168.98.12", 1883, 60)
 
 threading.Thread(target=client.loop_forever).start()
 
@@ -93,13 +94,14 @@ def construct_message(latitude,longtitude, speed):
     m["latitude"] = latitude
     m["longitude"] = longtitude
     m["speed"] = speed
+    m["stationID"] = ID
     m = json.dumps(m)
     return m
 
 # street = [(start.x, start.y), (end.x, end.y)]
 
-A25_1 = [(40.636800, -8.667729),(40.639178, -8.664639),110]
-A25_2 = [(40.639178, -8.664639),(40.642825, -8.659768),100]
+A25_1 = [(40.636800, -8.667729),(40.639178, -8.664639),100]
+A25_2 = [(40.639178, -8.664639),(40.642825, -8.659768),110]
 A25_3 = [(40.642825, -8.659768),(40.646065, -8.654425),120]
 A25_4 = [(40.646065, -8.654425),(40.648198, -8.650198),110]
 A25_5 = [(40.648198, -8.650198),(40.650509, -8.646250),120]
@@ -112,7 +114,7 @@ A25_5_street = coordinates_to_dict(get_coordinates(A25_5[0][0], A25_5[0][1], A25
 
 def main():
     path = [A25_1_street, A25_2_street, A25_3_street, A25_4_street, A25_5_street]
-    speed = [110, 100, 120, 110, 120]
+    speed = [100, 110, 120, 110, 120]
     while True:
         travel(path, speed, 0.1)
 

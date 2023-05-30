@@ -11,7 +11,7 @@ import math
 from termcolor import colored
 import threading
 
-ID=1
+ID=3
 
 def calculate_initial_compass_bearing(pointA, pointB):
     """
@@ -91,7 +91,7 @@ def travel(street_list, speed_list, delay):
 client = mqtt.Client()
 # client.on_connect = on_connect
 # client.on_message = on_message
-client.connect("192.168.98.11", 1883, 60)
+client.connect("192.168.98.13", 1883, 60)
 
 threading.Thread(target=client.loop_forever).start()
 
@@ -114,37 +114,64 @@ def construct_message(latitude,longtitude, speed):
 #street = [(start.x, start.y), (end.x, end.y), speed in km/h]
 
 av_25_abril_1 = [(40.638049, -8.649238), (40.636935, -8.647825), 55]
+av_25_abril_1_r = [(40.636935, -8.647825), (40.638049, -8.649238), 55]
+av_25_abril_half = [(40.637536, -8.648598), (40.638049, -8.649238), 55]
 av_25_abril_2 = [(40.636935, -8.647825), (40.636039, -8.646736), 50]
+av_25_abril_2_r = [(40.636039, -8.646736), (40.636935, -8.647825), 50]
 av_25_abril_3 = [(40.636039, -8.646736), (40.634814, -8.645164), 55]
 av_oita_1 = [(40.636731, -8.645732), (40.636039, -8.646736), 40]
 av_oita_1_r = [(40.636039, -8.646736), (40.636731, -8.645732), 40]
 av_oita_2 = [(40.636039, -8.646736), (40.635729, -8.647199), 45]
+av_oita_2_r = [(40.635729, -8.647199), (40.636039, -8.646736), 45]
 r_neves_1 = [(40.637832, -8.646591), (40.636935, -8.647825), 30]
 r_neves_2 = [(40.636935, -8.647825), (40.636576, -8.648289), 30]
+r_neves_2_r = [(40.636576, -8.648289), (40.636935, -8.647825), 30]
 r_martinho_1 = [(40.635729, -8.647199), (40.636578, -8.648285), 30]
+r_martinho_1_r = [(40.636578, -8.648285), (40.635729, -8.647199), 50]
 r_martinho_2 = [(40.636578, -8.648285), (40.637294, -8.649625), 30]
+r_martinho_2_r = [(40.637294, -8.649625), (40.636578, -8.648285), 50]
+r_martinho_2_half = [(40.636578, -8.648285), (40.637095, -8.649157), 30]
 r_tv_martinho_1 = [(40.637294, -8.649625), (40.637514, -8.649407), 30]
+r_tv_martinho_1_r = [(40.637514, -8.649407), (40.637294, -8.649625), 30]
 r_tv_martinho_2 = [(40.637514, -8.649407), (40.637797, -8.649554), 30]
+r_tv_martinho_2_r = [(40.637797, -8.649554), (40.637514, -8.649407), 30]
 r_tv_martinho_3 = [(40.637797, -8.649554), (40.638049, -8.649238), 30]
+r_tv_martinho_3_r = [(40.638049, -8.649238), (40.637797, -8.649554), 30]
+r_infante = [(40.637096, -8.649153), (40.637534, -8.648609), 30]
 
 av_25_abril_1_street = coordinates_to_dict(get_coordinates(av_25_abril_1[0][0], av_25_abril_1[0][1], av_25_abril_1[1][0], av_25_abril_1[1][1], av_25_abril_1[2]))
+av_25_abril_1_r_street = coordinates_to_dict(get_coordinates(av_25_abril_1_r[0][0], av_25_abril_1_r[0][1], av_25_abril_1_r[1][0], av_25_abril_1_r[1][1], av_25_abril_1_r[2]))
+av_25_abril_half_street = coordinates_to_dict(get_coordinates(av_25_abril_half[0][0], av_25_abril_half[0][1], av_25_abril_half[1][0], av_25_abril_half[1][1], av_25_abril_half[2]))
 av_25_abril_2_street = coordinates_to_dict(get_coordinates(av_25_abril_2[0][0], av_25_abril_2[0][1], av_25_abril_2[1][0], av_25_abril_2[1][1], av_25_abril_2[2]))
+av_25_abril_2_r_street = coordinates_to_dict(get_coordinates(av_25_abril_2_r[0][0], av_25_abril_2_r[0][1], av_25_abril_2_r[1][0], av_25_abril_2_r[1][1], av_25_abril_2_r[2]))
 av_25_abril_3_street = coordinates_to_dict(get_coordinates(av_25_abril_3[0][0], av_25_abril_3[0][1], av_25_abril_3[1][0], av_25_abril_3[1][1], av_25_abril_3[2]))
 av_oita_1_street = coordinates_to_dict(get_coordinates(av_oita_1[0][0], av_oita_1[0][1], av_oita_1[1][0], av_oita_1[1][1], av_oita_1[2]))
 av_oita_1_r_street = coordinates_to_dict(get_coordinates(av_oita_1_r[0][0], av_oita_1_r[0][1], av_oita_1_r[1][0], av_oita_1_r[1][1], av_oita_1_r[2]))
 av_oita_2_street = coordinates_to_dict(get_coordinates(av_oita_2[0][0], av_oita_2[0][1], av_oita_2[1][0], av_oita_2[1][1], av_oita_2[2]))
+av_oita_2_r_street = coordinates_to_dict(get_coordinates(av_oita_2_r[0][0], av_oita_2_r[0][1], av_oita_2_r[1][0], av_oita_2_r[1][1], av_oita_2_r[2]))
 r_neves_1_street = coordinates_to_dict(get_coordinates(r_neves_1[0][0], r_neves_1[0][1], r_neves_1[1][0], r_neves_1[1][1], r_neves_1[2]))
 r_neves_2_street = coordinates_to_dict(get_coordinates(r_neves_2[0][0], r_neves_2[0][1], r_neves_2[1][0], r_neves_2[1][1], r_neves_2[2]))
+r_neves_2_r_street = coordinates_to_dict(get_coordinates(r_neves_2_r[0][0], r_neves_2_r[0][1], r_neves_2_r[1][0], r_neves_2_r[1][1], r_neves_2_r[2]))
 r_martinho_1_street = coordinates_to_dict(get_coordinates(r_martinho_1[0][0], r_martinho_1[0][1], r_martinho_1[1][0], r_martinho_1[1][1], r_martinho_1[2]))
+r_martinho_1_r_street = coordinates_to_dict(get_coordinates(r_martinho_1_r[0][0], r_martinho_1_r[0][1], r_martinho_1_r[1][0], r_martinho_1_r[1][1], r_martinho_1_r[2]))
 r_martinho_2_street = coordinates_to_dict(get_coordinates(r_martinho_2[0][0], r_martinho_2[0][1], r_martinho_2[1][0], r_martinho_2[1][1], r_martinho_2[2]))
+r_martinho_2_r_street = coordinates_to_dict(get_coordinates(r_martinho_2_r[0][0], r_martinho_2_r[0][1], r_martinho_2_r[1][0], r_martinho_2_r[1][1], r_martinho_2_r[2]))
+r_martinho_2_half_street = coordinates_to_dict(get_coordinates(r_martinho_2_half[0][0], r_martinho_2_half[0][1], r_martinho_2_half[1][0], r_martinho_2_half[1][1], r_martinho_2_half[2]))
 r_tv_martinho_1_street = coordinates_to_dict(get_coordinates(r_tv_martinho_1[0][0], r_tv_martinho_1[0][1], r_tv_martinho_1[1][0], r_tv_martinho_1[1][1], r_tv_martinho_1[2]))
+r_tv_martinho_1_r_street = coordinates_to_dict(get_coordinates(r_tv_martinho_1_r[0][0], r_tv_martinho_1_r[0][1], r_tv_martinho_1_r[1][0], r_tv_martinho_1_r[1][1], r_tv_martinho_1_r[2]))
 r_tv_martinho_2_street = coordinates_to_dict(get_coordinates(r_tv_martinho_2[0][0], r_tv_martinho_2[0][1], r_tv_martinho_2[1][0], r_tv_martinho_2[1][1], r_tv_martinho_2[2]))
+r_tv_martinho_2_r_street = coordinates_to_dict(get_coordinates(r_tv_martinho_2_r[0][0], r_tv_martinho_2_r[0][1], r_tv_martinho_2_r[1][0], r_tv_martinho_2_r[1][1], r_tv_martinho_2_r[2]))
 r_tv_martinho_3_street = coordinates_to_dict(get_coordinates(r_tv_martinho_3[0][0], r_tv_martinho_3[0][1], r_tv_martinho_3[1][0], r_tv_martinho_3[1][1], r_tv_martinho_3[2]))
+r_tv_martinho_3_r_street = coordinates_to_dict(get_coordinates(r_tv_martinho_3_r[0][0], r_tv_martinho_3_r[0][1], r_tv_martinho_3_r[1][0], r_tv_martinho_3_r[1][1], r_tv_martinho_3_r[2]))
+r_infante_street = coordinates_to_dict(get_coordinates(r_infante[0][0], r_infante[0][1], r_infante[1][0], r_infante[1][1], r_infante[2]))
 
 # create a main function that will run the program
 def main():
-    path = [av_25_abril_1_street, av_25_abril_2_street, av_oita_2_street,  r_martinho_1_street, r_martinho_2_street, r_tv_martinho_1_street, r_tv_martinho_2_street, r_tv_martinho_3_street]
-    speed = [55, 50, 45, 30, 30, 30, 30, 30]
+    # path = [av_25_abril_1_street, av_25_abril_2_street, av_oita_2_street,  r_martinho_1_street, r_martinho_2_street, r_tv_martinho_1_street, r_tv_martinho_2_street, r_tv_martinho_3_street]
+    path = [av_25_abril_2_r_street,r_neves_2_street, r_martinho_2_half_street, r_infante_street, \
+            av_25_abril_half_street, r_tv_martinho_3_r_street, r_tv_martinho_2_r_street, r_tv_martinho_1_r_street, \
+            r_martinho_2_r_street, r_martinho_1_r_street, av_oita_2_r_street]
+    speed = [50, 30, 30, 30, 55, 30, 30, 30, 50, 50, 50]
     while True:
         #main street with average speed of 50km/h and resolution of 10Hz
         travel(path, speed, 0.1)

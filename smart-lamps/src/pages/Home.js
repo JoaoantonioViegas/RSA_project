@@ -7,47 +7,76 @@ import L from 'leaflet'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const CustomToast = ({ content }) => (
+const CustomToast = ({ content, description }) => (
   <div>
     <div>{content}</div>
+    <h5>{description}</h5>
   </div>
 );
 
 function Home() {
 
-  const [carPos, setCarPos] = useState([40.636500, -8.647291])
+  const [obuData, setObuData] = useState({})
   const [speed, setSpeed] = useState(0)
   const [lampData, setLampData] = useState({})
+  const [rsuRanges, setRsuRanges] = useState({})
 
-  const circleRadius = 70; // meters
+  const circleRadius = 100; // meters
   const circleColor = 'red';
-  const circleOpacity = 0.3;
+  const rsuCircleRadius = 150;
+  const rsuCircleColor = 'green';
+  const circleOpacity = 0.2;
 
   useEffect(() => {
     const interval = setInterval(() => {
-      //fetch car position from localhost:5000/api/v1/obu
       async function fetchCarPos() {
         const res = await fetch('http://localhost:5000/api/v1/obu')
         const data = await res.json()
-        setCarPos([data.latitude, data.longitude])
-        setSpeed(data.speed)
+        setObuData(data)
       }
+      fetchCarPos()
+    }, 100)
+    return () => clearInterval(interval)
+  }, [])
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
       async function fetchLampData() {
         const res = await fetch('http://localhost:5000/api/v1/rsu_data')
         const data = await res.json()
         setLampData(data)
-        console.log(data)
+        // console.log(data)
       }
-      fetchCarPos()
       fetchLampData()
     }, 100)
     return () => clearInterval(interval)
   }, [])
 
-  const notify = (content) => {
-    toast(<CustomToast content={content} />, {
+  useEffect(() => {
+    let newRsuRanges = {...rsuRanges};
+    Object.keys(lampData).forEach((key) => {
+      const in_range = lampData[key].in_range
+      let prev_in_range = false
+      if (!(key in rsuRanges)) {
+        prev_in_range = false
+      } else {
+        prev_in_range = rsuRanges[key]
+      }
+      if (prev_in_range === false && in_range === true) {
+        let rsu_alerted = lampData[key].close_stations
+        let rsu_alerted_str = rsu_alerted.join(', ')
+        notify(`RSU ${key} is in range`, `RSU in range. Alerting stations: ${rsu_alerted_str}`)
+      } 
+      newRsuRanges[key] = in_range;
+    })
+  
+    setRsuRanges(newRsuRanges);
+  }, [lampData])
+
+  const notify = (content, description) => {
+    toast(<CustomToast content={content} description={description} />, {
       position: "top-right",
-      autoClose: 2000,
+      autoClose: 20000,
       hideProgressBar: true,
       closeOnClick: false,
       pauseOnHover: true,
@@ -265,33 +294,57 @@ function Home() {
           maxZoom={23}
             url="https://api.mapbox.com/styles/v1/jp-amaral/cl758vsmy000714o2rx0w0779/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoianAtYW1hcmFsIiwiYSI6ImNsNzU4c3g1MzExMHozbm1hdWlvbnRrbmoifQ.SpZQvOQyQCwhNZluPGPXQg"
           />
-          <Marker position={carPos} icon={carIcon}>
+          {/* <Marker position={carPos} icon={carIcon}>
             <Popup>
               Speed: {speed} km/h
             </Popup>
-          </Marker>
-          <Circle
-          center={carPos}
-          radius={circleRadius}
-          color={circleColor}
-          fillOpacity={circleOpacity}
-        />
+          </Marker> */}
+          {/* <Circle
+            center={carPos}
+            radius={circleRadius}
+            color={circleColor}
+            fillOpacity={circleOpacity}
+          /> */}
+          {Object.keys(obuData).map((key, index) => (
+            <div>
+              <Marker key={index} position={[obuData[key].latitude, obuData[key].longitude]} icon={carIcon}>
+                <Popup>
+                  Speed: {obuData[key].speed} km/h
+                  ID: {key}
+                </Popup>
+              </Marker>
+              <Circle
+              center={[obuData[key].latitude, obuData[key].longitude]}
+              radius={circleRadius}
+              color={circleColor}
+              fillOpacity={circleOpacity}
+            />
+            </div>
+          ))} 
           {Object.keys(lampData).map((key, index) => (
-            <Marker key={index} position={[lampData[key].lat + 0.00005, lampData[key].lon+0.00002]} icon={getIconFromIntensity(lampData[key].intensity, lampData[key].rsu)}>
-              <Popup>
-                <b>Smart Lamp</b><br/>
-                <b>Id:</b> {key}<br/>
-                <b>Intensity:</b> {lampData[key].intensity}<br/>
-                <b>In Range:</b> {lampData[key].in_range ? 'Yes' : 'No'}<br/>
-                <b>Ordering RSU ID:</b> {lampData[key].ordering_rsu_id}<br/>
-              </Popup>
-            </Marker>
+            <div>
+              <Marker key={index} position={[lampData[key].lat + 0.00005, lampData[key].lon+0.00002]} icon={getIconFromIntensity(lampData[key].intensity, lampData[key].rsu)}>
+                <Popup>
+                  <b>Smart Lamp</b><br/>
+                  <b>Id:</b> {key}<br/>
+                  <b>Intensity:</b> {lampData[key].intensity}<br/>
+                  {lampData[key].rsu && (<div><b>In Range:</b> {lampData[key].in_range ? 'Yes' : 'No'}<br/></div>)}
+                  <b>Ordering RSU ID:</b> {lampData[key].ordering_rsu_id}<br/>
+                </Popup>
+              </Marker>
+              {/* <Circle
+              center={[lampData[key].lat + 0.00005, lampData[key].lon+0.00002]}
+              radius={rsuCircleRadius}
+              color={rsuCircleColor}
+              fillOpacity={circleOpacity}
+            /> */}
+            </div>
           ))}
         </MapContainer>
       </div>  
       <div className="sidebar">
         {/* <button onClick={() => notify('Hello there')}>Hello Notification</button> */}
-        <button onClick={() => notify('Welcome back')}>Welcome Notification</button>
+        {/* <button onClick={() => notify('Welcome back')}>Welcome Notification</button> */}
         <ToastContainer newestOnTop />
       </div>
     </div>

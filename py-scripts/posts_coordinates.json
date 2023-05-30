@@ -1,178 +1,181 @@
 {
     "1": {
-        "Latitude": 40.636032,
-        "Longitude": -8.646632,
-        "Status": "On",
-        "RSU": true
+        "latitude": 40.636032,
+        "longitude": -8.646632,
+        "status": "On",
+        "rsu": true
     }, 
     "2": {
-        "Latitude": 40.635939,
-        "Longitude": -8.646695,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.635939,
+        "longitude": -8.646695,
+        "status": "On",
+        "rsu": false
     },
     "3": {
-        "Latitude": 40.636095,
-        "Longitude": -8.646893,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.636095,
+        "longitude": -8.646893,
+        "status": "On",
+        "rsu": false
     },
     "4": {
-        "Latitude": 40.636454, 
-        "Longitude": -8.647312,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.636454, 
+        "longitude": -8.647312,
+        "status": "On",
+        "rsu": false
     },
     "5": {
-        "Latitude": 40.635648,  
-        "Longitude": -8.646314,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.635648,  
+        "longitude": -8.646314,
+        "status": "On",
+        "rsu": false
     },
 
     "6": {
-        "Latitude": 40.635727,   
-        "Longitude": -8.647118,
-        "Status": "On",
-        "RSU": true
+        "latitude": 40.635727,   
+        "longitude": -8.647118,
+        "status": "On",
+        "rsu": true
     },
     "7": {
-        "Latitude": 40.635802,   
-        "Longitude": -8.647199,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.635802,   
+        "longitude": -8.647199,
+        "status": "On",
+        "rsu": false
     },
     "8": {
-        "Latitude": 40.636169, 
-        "Longitude": -8.647692,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.636169, 
+        "longitude": -8.647692,
+        "status": "On",
+        "rsu": false
     },
 
     "9": {
-        "Latitude": 40.636570, 
-        "Longitude": -8.648376,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.636570, 
+        "longitude": -8.648376,
+        "status": "On",
+        "rsu": false
     },
     "10": {
-        "Latitude": 40.636584,  
-        "Longitude": -8.648210,
-        "Status": "On",
-        "RSU": true
+        "latitude": 40.636584,  
+        "longitude": -8.648210,
+        "status": "On",
+        "rsu": true
     },
 
     "11": {
-        "Latitude": 40.636991,  
-        "Longitude": -8.647816, 
-        "Status": "On",
-        "RSU": true
+        "latitude": 40.636991,  
+        "longitude": -8.647816, 
+        "status": "On",
+        "rsu": true
     },
     "12": {
-        "Latitude": 40.636855, 
-        "Longitude": -8.647819 , 
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.636855, 
+        "longitude": -8.647819 , 
+        "status": "On",
+        "rsu": false
     },
     
     "13": {
-        "Latitude": 40.637100, 
-        "Longitude": -8.649072 , 
-        "Status": "On",
-        "RSU": true
+        "latitude": 40.637100, 
+        "longitude": -8.649072 , 
+        "status": "On",
+        "rsu": true
     },
     "14": {
-        "Latitude": 40.637285,  
-        "Longitude": -8.648828 , 
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.637285,  
+        "longitude": -8.648828 , 
+        "status": "On",
+        "rsu": false
     },
 
     "15": {
-        "Latitude": 40.637318, 
-        "Longitude": -8.649641, 
-        "Status": "On",
-        "RSU": true
+        "latitude": 40.637318, 
+        "longitude": -8.649641, 
+        "status": "On",
+        "rsu": true
     },
 
     "16": {
-        "Latitude": 40.638006, 
-        "Longitude": -8.649255, 
-        "Status": "On",
-        "RSU": true
+        "latitude": 40.638006, 
+        "longitude": -8.649255, 
+        "status": "On",
+        "rsu": true
     },
 
     "17": {
-        "Latitude": 40.638118, 
-        "Longitude": -8.649236 , 
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.638118, 
+        "longitude": -8.649236 , 
+        "status": "On",
+        "rsu": false
     },
 
     "18": {
-        "Latitude": 40.637462, 
-        "Longitude": -8.648595 , 
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.637462, 
+        "longitude": -8.648595 , 
+        "status": "On",
+        "rsu": false
     },
+
+
+    
     "19": {
-        "Latitude": 40.638657,  
-        "Longitude": -8.665186,
-        "Status": "On",
-        "RSU": true
+        "latitude": 40.640030, 
+        "longitude": -8.663484,
+        "status": "On",
+        "rsu": true
     },
     "20": {
-        "Latitude": 40.639504,   
-        "Longitude": -8.664059,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.640461,  
+        "longitude": -8.662969 ,
+        "status": "On",
+        "rsu": false
     },
     "21": {
-        "Latitude": 40.640293,    
-        "Longitude": -8.662987,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.640893,   
+        "longitude":  -8.662422 ,
+        "status": "On",
+        "rsu": false
     },
     "22": {
-        "Latitude": 40.641474,    
-        "Longitude": -8.661517,
-        "Status": "On",
-        "RSU": true
+        "latitude": 40.641357,
+        "longitude": -8.661778,
+        "status": "On",
+        "rsu": true
     },
     "23": {
-        "Latitude": 40.642614,    
-        "Longitude": -8.659983,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.641748,   
+        "longitude":  -8.661274,
+        "status": "On",
+        "rsu": false
     },
     "24": {
-        "Latitude": 40.643794,      
-        "Longitude": -8.658234,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.642098,      
+        "longitude": -8.660770,
+        "status": "On",
+        "rsu": false
     },
     "25": {
-        "Latitude": 40.644657,      
-        "Longitude": -8.656839,
-        "Status": "On",
-        "RSU": true
+        "latitude": 40.642432,      
+        "longitude": -8.660319,
+        "status": "On",
+        "rsu": true
     },  
     "26": {
-        "Latitude": 40.645642,      
-        "Longitude": -8.655015,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.642798,      
+        "longitude": -8.659793,
+        "status": "On",
+        "rsu": false
     },
     "27": {
-        "Latitude": 40.646562,     
-        "Longitude": -8.653363,
-        "Status": "On",
-        "RSU": false
+        "latitude": 40.643205,     
+        "longitude": -8.659192, 
+        "status": "On",
+        "rsu": false
     },
     "28": {
-        "Latitude": 40.647531,       
-        "Longitude": -8.651400,
-        "Status": "On",
-        "RSU": true
+        "latitude": 40.643487,   
+        "longitude": -8.658731 ,
+        "status": "On",
+        "rsu": true
     }
 }

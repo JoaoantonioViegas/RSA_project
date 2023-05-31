@@ -35,9 +35,7 @@ def on_messageLSM(client, userdata, msg):
     dest_stations = message["dest_stations"]
     POSTS_status[id]['intensity'] = intensity
     POSTS_status[id]['target_posts'] = dest_stations
-    json_formatted_str = json.dumps(POSTS_status, indent=2)
-    with open('logs.json', 'w') as file:
-        file.write(json_formatted_str)
+    
 
 #LSM broker
 clientLSM = mqtt.Client()

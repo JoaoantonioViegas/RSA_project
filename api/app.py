@@ -135,7 +135,9 @@ def on_messageLSM(client, userdata, msg):
             if POSTS_status[key]['in_range'] == True:
                 POSTS_status[key]['ordering_rsu_id'] = int(key)
     
-    # print(POSTS_status)
+    # json_formatted_str = json.dumps(POSTS_status, indent=2)
+    # with open('logs.json', 'w') as file:
+    #     file.write(json_formatted_str)
 
 #connect to obu
 clientOBUS = mqtt.Client()

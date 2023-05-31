@@ -93,7 +93,7 @@ def on_connectLSM(client, userdata, flags, rc):
 def on_messageLSM(client, userdata, msg):
     global rsu_MESSAGE, POSTS_status, ORDERING_INTENSITIES
     message = json.loads(msg.payload)
-    # print(message)
+    print(message)
     rsu_MESSAGE = msg.payload
 
     id = str(message["station_id"])
@@ -116,33 +116,47 @@ def on_messageLSM(client, userdata, msg):
 
     #for each post, adds the intensity that it receives from the rsu (id)
 
-    # for key, value in ORDERING_INTENSITIES.items():
-    #     ORDERING_INTENSITIES[key][id] = dest_stations[key]
-    
-    # #for each post, gets the intensity by averaging the intensities received from each rsu
+    for key, value in ORDERING_INTENSITIES.items():
+        if key in dest_stations:
+            intensity = dest_stations[key]
+            if intensity == -1:
+                if id in ORDERING_INTENSITIES[key]: # Only delete if the key exists
+                    del ORDERING_INTENSITIES[key][id]
+            else:
+                ORDERING_INTENSITIES[key][id] = dest_stations[key]
 
-    # if POSTS_status != {}:
-    #     for key, value in ORDERING_INTENSITIES.items():
-    #         if key not in POSTS_status:
-    #             POSTS_status[str(key)] = {}
-    #         average = 0
-    #         for k, v in value.items():
-    #             if v != -1:
-    #                 average += v
-    #         average = average/len(value)
-    #         POSTS_status[key]['intensity'] = average
-    #         POSTS_status[key]['ordering_rsu_id'] = int(id)
+    # #for each post, gets the max intensity that it receives from the rsus
+
+    if POSTS_status != {}:
+        for key, value in ORDERING_INTENSITIES.items():
+            if key not in POSTS_status:
+                POSTS_status[str(key)] = {}
+            max = 0
+            id_max = -1
+            for key2, value2 in value.items():
+                if value2 > max:
+                    max = value2
+                    id_max = key2
+            if max == 0:
+                max = 20
+            POSTS_status[key]['intensity'] = max
+            print("key: " + str(key) + " max: " + str(max) + " id: " + str(id_max))
+            POSTS_status[key]['ordering_rsu_id'] = int(id_max)
 
     # print("-------------------")
     # print(message)
     # print(ORDERING_INTENSITIES)
+    print("-------------------")
+    print(ORDERING_INTENSITIES)
+    # print("...")
+    # print(POSTS_status)
 
-    if POSTS_status != {}:
-        for key, value in dest_stations.items():
-            if key not in POSTS_status:
-                POSTS_status[str(key)] = {}
-            POSTS_status[key]['intensity'] = value
-            POSTS_status[key]['ordering_rsu_id'] = int(id)
+    # if POSTS_status != {}:
+    #     for key, value in dest_stations.items():
+    #         if key not in POSTS_status:
+    #             POSTS_status[str(key)] = {}
+    #         POSTS_status[key]['intensity'] = value
+    #         POSTS_status[key]['ordering_rsu_id'] = int(id)
     
 
 #connect to obu

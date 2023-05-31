@@ -84,28 +84,39 @@ def on_messageRsu(client, userdata, msg):
 
 def on_messageObu(client, userdata, msg):
     global MY_STATUS, MY_INTENSITY, BIAS, IN_RANGE, OBUS, IN_RANGES
-
+    #message info
     message = json.loads(msg.payload)
     longitude = message["longitude"]
     latitude = message["latitude"]
     speed = message["speed"]
     obu_id = message["stationID"]
 
+    #check if this obu is in range and save it in the dictionary
     distance_between_car_and_post = round(distance((latitude, longitude), (post.x, post.y)).meters,2)
     if(distance_between_car_and_post > RADIUS):
+        #check if in the previous iteration it was in range
+        if(obu_id in IN_RANGES):
+            if IN_RANGES[obu_id] == True:
+                #last iteration it was in range, so it just left
+                OBUS[obu_id]["longitude"] = -1
+                OBUS[obu_id]["latitude"] = -1
+                OBUS[obu_id]["speed"] = -1
+                times = get_times_to_arrival(False)
+                intensities = get_intensities(times, False, BIAS)
+                out_message = construct_message([2], MY_INTENSITY, intensities, latitude, longitude, obu_id)
+                publish_lsm(out_message)
         IN_RANGES[obu_id] = False
     else:
         IN_RANGES[obu_id] = True
-    #check if any obu is in range
+
+    #stop processing if there are no obus in range and set IN_RANGE to false
     if not any(IN_RANGES.values()):
         IN_RANGE = False
         return
     else:
         IN_RANGE = True
 
-    distance_between_car_and_post = round(distance((latitude, longitude), (post.x, post.y)).meters,2)
-
-    if(distance_between_car_and_post > 70):
+    if(distance_between_car_and_post > RADIUS):
         # print(colored("Distance is: ", "red"), colored(distance_between_car_and_post, "red"))
         return
 
@@ -128,33 +139,27 @@ def on_messageObu(client, userdata, msg):
     facing = facing_post(last_3_distances)
     # print(facing)
 
-    print(colored("Distance between car and post: ","blue"), closest_distance)
-    print(colored("Not facing post: ", "blue"), facing)
-    print(colored("Speed: ", "blue"), speed)
+    
 
-    if(MY_STATUS == "on"):
-        print(colored("My status: ", "green"), colored(MY_STATUS, "green"))
-    else:
-        print(colored("My status: ", "red"), colored(MY_STATUS, "red"))
+    # if(MY_STATUS == "on"):
+    #     print(colored("My status: ", "green"), colored(MY_STATUS, "green"))
+    # else:
+    #     print(colored("My status: ", "red"), colored(MY_STATUS, "red"))
 
     time_to_arrival = [round(calc_interval(closest_distance, speed),2)]
-    print(colored("Time to arrival: ", "green"), time_to_arrival)
     iluminacao = calc_iluminacao(closest_distance,speed, BIAS, facing)
     MY_INTENSITY = iluminacao
-
-    if iluminacao > 20 and MY_STATUS == "dimmed":
-        MY_STATUS = "on"
-    
-    elif iluminacao <= 20 and MY_STATUS == "on":
-        MY_STATUS = "dimmed"
-
+    print(colored("Time to arrival: ", "green"), time_to_arrival)
+    print(colored("Distance between car and post: ","blue"), closest_distance)
+    # print(colored("Not facing post: ", "blue"), facing)
+    print(colored("Speed: ", "blue"), speed)
     print(colored("Iluminacao: ", "yellow"), colored(iluminacao, "yellow"))  
     print("\n")
 
     
-    times = get_times_to_arrival()
+    times = get_times_to_arrival(True)
     intensities = get_intensities(times, facing, BIAS)
-    out_message = construct_message([2], MY_INTENSITY, intensities)
+    out_message = construct_message([2], MY_INTENSITY, intensities, latitude, longitude, obu_id)
     publish_lsm(out_message)
     
 def publish_lsm(message):
@@ -204,7 +209,7 @@ def facing_post(last_3_distances):
             return True
     return False
 
-def construct_message(destination, intensity, intensities):
+def construct_message(destination, intensity, intensities, latitude, longitude, obu_id):
     f = open('./out_lsm.json')
     m = json.load(f)
     m["dest_stations"] = intensities
@@ -212,25 +217,26 @@ def construct_message(destination, intensity, intensities):
     m["station_id"] = ID
     m["station_latitude"] = post.x
     m["station_longitude"] = post.y
-    # m["time_to_arrival"] = time_to_arrival
+    m["obu_latitude"] = latitude
+    m["obu_longitude"] = longitude
+    m["obu_id"] = obu_id
     now = datetime.now()
     m["timestamp"] = now.strftime("%Y-%m-%d %H:%M:%S:%f")
     m = json.dumps(m)
     return m
 
-def get_post_ids():
-    global LAMPS
-    ids = []
-    for key, value in LAMPS.items():
-        lat = value['latitude']
-        lon = value['longitude']
-        difference_between_posts = round(distance((lat, lon), (post.x, post.y)).meters,2)
-        print(colored("Distance between posts: ", "blue"), difference_between_posts)
-        if difference_between_posts < RADIUS*1.5:
-            ids.append(key)
-    return ids
+# def get_post_ids():
+#     global LAMPS
+#     ids = []
+#     for key, value in LAMPS.items():
+#         lat = value['latitude']
+#         lon = value['longitude']
+#         difference_between_posts = round(distance((lat, lon), (post.x, post.y)).meters,2)
+#         if difference_between_posts < RADIUS*1.8:
+#             ids.append(key)
+#     return ids
 
-def get_times_to_arrival():
+def get_times_to_arrival(in_range):
     global LAMPS, OBUS, RADIUS
     #for all the LAMPS, calculate the time to arrival of the closest obu
     times = {}
@@ -239,11 +245,12 @@ def get_times_to_arrival():
         lon = value['longitude']
         distance_val, obu_id = get_closest_obu(OBUS, lat, lon)
         difference_between_posts = round(distance((lat, lon), (post.x, post.y)).meters,2)
-        print(colored("Distance between posts: ", "blue"), difference_between_posts)
         if difference_between_posts < RADIUS*1.8:
-            time_to_arrival = round(calc_interval(distance_val, OBUS[obu_id]["speed"]),2)
-            times[key] = time_to_arrival
-        
+            if(in_range):
+                time_to_arrival = round(calc_interval(distance_val, OBUS[obu_id]["speed"]),2)
+                times[key] = time_to_arrival
+            else:
+                times[key] = -1
     print(times)
     return times
 
@@ -268,8 +275,9 @@ def get_intensities(times, facing, bias):
         temp = intensity_on_time(value, facing,  bias)
         if (temp > 20):
             intensities[key] = temp
+        elif (value == -1):
+            intensities[key] = -1
         # intensities[key] = intensity_on_time(value, bias)
-
 
     return intensities
 
@@ -279,6 +287,8 @@ def get_closest_obu(OBUS, post_lat, post_long):
     for key, value in OBUS.items():
         obu_lat = value['latitude']
         obu_long = value['longitude']
+        if obu_lat == -1 and obu_long == -1:
+            continue
         distance_between_car_and_post = round(distance((obu_lat, obu_long), (post_lat, post_long)).meters,2)
         if distance_between_car_and_post < closest_distance:
             closest_distance = distance_between_car_and_post

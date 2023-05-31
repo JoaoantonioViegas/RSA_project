@@ -8,7 +8,7 @@ import math
 from termcolor import colored
 import threading
 
-ID=3
+ID=4
 
 def calculate_initial_compass_bearing(pointA, pointB):
     if (type(pointA) != tuple) or (type(pointB) != tuple):
@@ -79,7 +79,7 @@ def travel(street_list, speed_list, delay):
 client = mqtt.Client()
 # client.on_connect = on_connect
 # client.on_message = on_message
-client.connect("192.168.98.13", 1883, 60)
+client.connect("192.168.98.14", 1883, 60)
 
 threading.Thread(target=client.loop_forever).start()
 

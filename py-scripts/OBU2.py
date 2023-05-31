@@ -113,8 +113,8 @@ A25_4_street = coordinates_to_dict(get_coordinates(A25_4[0][0], A25_4[0][1], A25
 A25_5_street = coordinates_to_dict(get_coordinates(A25_5[0][0], A25_5[0][1], A25_5[1][0], A25_5[1][1], A25_5[2]))
 
 def main():
-    path = [A25_1_street, A25_2_street, A25_3_street, A25_4_street, A25_5_street]
-    speed = [100, 110, 120, 110, 120]
+    path = [A25_1_street, A25_2_street, A25_3_street, A25_4_street]
+    speed = [100, 110, 120, 110]
     while True:
         travel(path, speed, 0.1)
 

@@ -6,6 +6,8 @@ import './Home.css'
 import L from 'leaflet'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Toggle from 'react-toggle'
+import "react-toggle/style.css" // for ES6 modules
 
 const CustomToast = ({ content, description }) => (
   <div>
@@ -20,6 +22,7 @@ function Home() {
   const [speed, setSpeed] = useState(0)
   const [lampData, setLampData] = useState({})
   const [rsuRanges, setRsuRanges] = useState({})
+  const [showHighwayInfo, setShowHighwayInfo] = useState(true)
 
   const circleRadius = 100; // meters
   const circleColor = 'red';
@@ -65,7 +68,11 @@ function Home() {
       if (prev_in_range === false && in_range === true) {
         let rsu_alerted = lampData[key].close_stations
         let rsu_alerted_str = rsu_alerted.join(', ')
-        notify(`RSU ${key} is in range`, `RSU in range. Alerting stations: ${rsu_alerted_str}`)
+        const highway_keys = ['19', '22', '25', '28']
+        console.log(highway_keys.includes(key))
+        if (showHighwayInfo || !highway_keys.includes(key)) {
+          notify(`RSU ${key} is in range`, `RSU in range. Alerting stations: ${rsu_alerted_str}`);
+        }
       } 
       newRsuRanges[key] = in_range;
     })
@@ -83,6 +90,10 @@ function Home() {
       draggable: false,
     });
   };
+
+  const handleToggle = () => {
+    setShowHighwayInfo(!showHighwayInfo)
+  }
 
 
 
@@ -282,6 +293,12 @@ function Home() {
   }
   return (
     <div className='container'>
+      <label className="toggle">
+        <Toggle
+          defaultChecked={showHighwayInfo}
+          onChange={handleToggle} />
+        <span style={{marginLeft:'10px'}}>Show Highway Notifications</span>
+      </label>
       <div className="map-container" >  
         <MapContainer 
           center={[40.637003, -8.648004]} 

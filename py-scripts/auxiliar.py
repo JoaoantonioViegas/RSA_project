@@ -19,59 +19,41 @@ client = mqtt.Client()
 client.connect(broker_address, broker_port, 60)
 client.loop_start()
 
+POSTS_status = {}
+
 with open('posts_coordinates.json') as json_file:
     posts = json.load(json_file)
 
-def on_connectObu(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
-    client.subscribe("vanetza/in/cam")
+def on_connectLSM(client, userdata, flags, rc):
+    print("Connected to rsus with result code "+str(rc))
+    client.subscribe("all/lsm")
 
-def on_messageObu(client, userdata, msg):
-    global obu_lat, obu_lon
-    msg = json.loads(msg.payload)
-    # print(msg)
-    obu_lat = msg['latitude']
-    obu_lon = msg['longitude']
+def on_messageLSM(client, userdata, msg):
+    message = json.loads(msg.payload)
+    id = str(message["station_id"])
+    intensity = message["intensity"]
+    dest_stations = message["dest_stations"]
+    POSTS_status[id]['intensity'] = intensity
+    POSTS_status[id]['target_posts'] = dest_stations
+    json_formatted_str = json.dumps(POSTS_status, indent=2)
+    with open('logs.json', 'w') as file:
+        file.write(json_formatted_str)
 
-    #loop through posts and check if the post is a RSU ("RSU": true)
-    #if it is, check if the obu is near the post (distance < 50m)
-    #if it is, print "NEAR POST WITH ID: " + post_id
-    #if not, print "NOT NEAR POST WITH ID: " + post_id
-    print("------------------")
-    for key, post in posts.items():
-        if post['RSU'] == True:
-            post_lat = post['Latitude']
-            post_lon = post['Longitude']
-            post_coords = (post_lat, post_lon)
-            obu_coords = (obu_lat, obu_lon)
-            dist = distance(post_coords, obu_coords).meters
-            if dist < 70:
-                print(colored("NEAR POST WITH ID: " + key, "green"))
-                #execute bash command 
-                bashCommand = "docker exec rsu"+str(key)+" block 6e:06:e0:03:00:01"
-                try:
-                    subprocess.run(bashCommand, shell=True, check=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                except subprocess.CalledProcessError as e:
-                    pass
+#LSM broker
+clientLSM = mqtt.Client()
+clientLSM.on_connect = on_connectLSM
+clientLSM.on_message = on_messageLSM
+clientLSM.connect("192.168.98.1")
 
-
-            else:
-                print(colored("NOT NEAR POST WITH ID: " + key, "red"))
-                bashCommand = "docker exec rsu"+str(key)+" unblock 6e:06:e0:03:00:01"
-                try:
-                    subprocess.run(bashCommand, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                except subprocess.CalledProcessError as e:
-                    pass
-
-# clientObu = mqtt.Client()
-# clientObu.on_connect = on_connectObu
-# clientObu.on_message = on_messageObu
-# clientObu.connect("192.168.98.10", 1883, 60)
-# threading.Thread(target=clientObu.loop_forever).start()
+threading.Thread(target=clientLSM.loop_forever).start()
+with open('posts_coordinates.json') as json_file:
+    data = json.load(json_file)
+    POSTS_status = data
 
 while True:
     with open('posts_coordinates.json') as json_file:
         data = json.load(json_file)
+        POSTS_status = data
         client.publish(topic, json.dumps(data))
         # print(colored("Published posts information to the MQTT broker", "green"))
     time.sleep(1)

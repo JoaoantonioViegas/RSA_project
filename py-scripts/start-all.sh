@@ -6,11 +6,15 @@ python3 auxiliar.py > /dev/null 2>&1 &
 echo "Starting OBU1..."
 python3 OBU1.py > /dev/null 2>&1 &
 
-# #OBU 2
+#OBU 2
 echo "Starting OBU2..."
 python3 OBU2.py > /dev/null 2>&1 &
 
-# #OBU 3
+#OBU 2R
+# echo "Starting OBU2R..."
+# python3 OBU2R.py > /dev/null 2>&1 &
+
+#OBU 3
 # echo "Starting OBU3..."
 # python3 OBU3.py > /dev/null 2>&1 &
 
@@ -62,6 +66,6 @@ python3 RSU-all.py 28 40.643487 8.658731 1.25 '192.168.98.28' > /dev/null 2>&1 &
 
 # #API
 echo "Starting API..."
-python3 ../api/app.py  &
+python3 ../api/app.py > /dev/null 2>&1 2>&1 &
 
 echo "All machines started."

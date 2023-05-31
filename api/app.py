@@ -81,8 +81,8 @@ def on_messagePostsAux(client, userdata, msg):
             POSTS_status[key]['in_range'] = False
         if 'ordering_rsu_id' not in POSTS_status[key]:
             POSTS_status[key]['ordering_rsu_id'] = -1
-        if 'close_stations' not in POSTS_status[key]:
-            POSTS_status[key]['close_stations'] = []
+        if 'target_posts' not in POSTS_status[key]:
+            POSTS_status[key]['target_posts'] = []
 
     # print(POSTS_status)
 
@@ -104,13 +104,13 @@ def on_messageLSM(client, userdata, msg):
     intensity = message["intensity"]
     dest_stations = message["dest_stations"]
     POSTS_status[id]['intensity'] = intensity
-    POSTS_status[id]['close_stations'] = list(dest_stations.keys())
+    POSTS_status[id]['target_posts'] = list(dest_stations.keys())
 
     # for key, value in POSTS_status.items():
-    #     if 'close_stations' not in POSTS_status[key]:
-    #         POSTS_status[key]['close_stations'] = []
-    #     close_stations = dest_stations.keys()
-    #     POSTS_status[key]['close_stations'] = close_stations 
+    #     if 'target_posts' not in POSTS_status[key]:
+    #         POSTS_status[key]['target_posts'] = []
+    #     target_posts = dest_stations.keys()
+    #     POSTS_status[key]['target_posts'] = target_posts 
 
     # print(dest_stations)
 

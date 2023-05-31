@@ -66,12 +66,12 @@ function Home() {
         prev_in_range = rsuRanges[key]
       }
       if (prev_in_range === false && in_range === true) {
-        let rsu_alerted = lampData[key].close_stations
+        let rsu_alerted = lampData[key].target_posts
         let rsu_alerted_str = rsu_alerted.join(', ')
         const highway_keys = ['19', '22', '25', '28']
         console.log(highway_keys.includes(key))
         if (showHighwayInfo || !highway_keys.includes(key)) {
-          notify(`RSU ${key} is in range`, `RSU in range. Alerting stations: ${rsu_alerted_str}`);
+          notify(`RSU ${key} is in range`, `Alerting lamp posts: ${rsu_alerted_str}`);
         }
       } 
       newRsuRanges[key] = in_range;
@@ -346,7 +346,7 @@ function Home() {
                   <b>Id:</b> {key}<br/>
                   <b>Intensity:</b> {lampData[key].intensity}<br/>
                   {lampData[key].rsu && (<div><b>In Range:</b> {lampData[key].in_range ? 'Yes' : 'No'}<br/></div>)}
-                  <b>Ordering RSU ID:</b> {lampData[key].ordering_rsu_id}<br/>
+                  {/* <b>Ordering RSU ID:</b> {lampData[key].ordering_rsu_id}<br/> */}
                 </Popup>
               </Marker>
               {/* <Circle

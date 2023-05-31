@@ -1,4 +1,3 @@
-#Create a simple Flask app that returns a JSON object with a key of 'message' and value of 'Hello World!'.
 import time
 import json
 from flask import Flask, jsonify
@@ -93,7 +92,6 @@ def on_connectLSM(client, userdata, flags, rc):
 def on_messageLSM(client, userdata, msg):
     global rsu_MESSAGE, POSTS_status, ORDERING_INTENSITIES
     message = json.loads(msg.payload)
-    print(message)
     rsu_MESSAGE = msg.payload
 
     id = str(message["station_id"])
@@ -104,15 +102,7 @@ def on_messageLSM(client, userdata, msg):
     intensity = message["intensity"]
     dest_stations = message["dest_stations"]
     POSTS_status[id]['intensity'] = intensity
-    POSTS_status[id]['target_posts'] = list(dest_stations.keys())
-
-    # for key, value in POSTS_status.items():
-    #     if 'target_posts' not in POSTS_status[key]:
-    #         POSTS_status[key]['target_posts'] = []
-    #     target_posts = dest_stations.keys()
-    #     POSTS_status[key]['target_posts'] = target_posts 
-
-    # print(dest_stations)
+    POSTS_status[id]['target_posts'] = dest_stations
 
     #for each post, adds the intensity that it receives from the rsu (id)
 
@@ -140,32 +130,20 @@ def on_messageLSM(client, userdata, msg):
             if max == 0:
                 max = 20
             POSTS_status[key]['intensity'] = max
-            print("key: " + str(key) + " max: " + str(max) + " id: " + str(id_max))
+            # print("key: " + str(key) + " max: " + str(max) + " id: " + str(id_max))
             POSTS_status[key]['ordering_rsu_id'] = int(id_max)
-
-    # print("-------------------")
-    # print(message)
-    # print(ORDERING_INTENSITIES)
-    print("-------------------")
-    print(ORDERING_INTENSITIES)
-    # print("...")
+            if POSTS_status[key]['in_range'] == True:
+                POSTS_status[key]['ordering_rsu_id'] = int(key)
+    
     # print(POSTS_status)
 
-    # if POSTS_status != {}:
-    #     for key, value in dest_stations.items():
-    #         if key not in POSTS_status:
-    #             POSTS_status[str(key)] = {}
-    #         POSTS_status[key]['intensity'] = value
-    #         POSTS_status[key]['ordering_rsu_id'] = int(id)
-    
-
 #connect to obu
-clientObu1 = mqtt.Client()
-clientObu1.on_connect = on_connectObu1
-clientObu1.on_message = on_messageObu1
-clientObu1.connect("192.168.98.10", 1883, 60)
+clientOBUS = mqtt.Client()
+clientOBUS.on_connect = on_connectObu1
+clientOBUS.on_message = on_messageObu1
+clientOBUS.connect("192.168.98.10", 1883, 60)
 
-threading.Thread(target=clientObu1.loop_forever).start()
+threading.Thread(target=clientOBUS.loop_forever).start()
 
 #rsus broker
 clientstatus = mqtt.Client()

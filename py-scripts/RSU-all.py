@@ -13,14 +13,9 @@ class post:
         self.x = x
         self.y = y
 
-# ID = 11
-# post = post(40.636991, -8.647816)
-# BIAS = 2.8   
-
-
 #make sure the program is called with the correct number of arguments (6)
-if len(sys.argv) != 6:
-    print("Usage: python3 RSU.py <ID> <latitude> <longitude> <bias> <IP>")
+if len(sys.argv) != 7:
+    print("Usage: python3 RSU.py <ID> <latitude> <longitude> <bias> <IP> <POST_RANGE (meters)>")
     sys.exit(1)
 
 #assign the arguments to variables
@@ -34,8 +29,8 @@ BIAS = float(sys.argv[4])
 print(colored("BIAS: ", "magenta"), colored(BIAS, "magenta"))
 IP = sys.argv[5]
 print(colored("IP: ", "magenta"), colored(IP, "magenta"))
-# HIGHWAY = sys.argv[6]
-# print(colored("HIGHWAY: ", "magenta"), colored(HIGHWAY, "magenta"))
+POST_RANGE = int(sys.argv[6])
+print(colored("POST_RANGE: ", "magenta"), colored(POST_RANGE, "magenta"))
 post = post(post.x, post.y)
 LAMPS = {}
 
@@ -80,7 +75,7 @@ def on_messageRsu(client, userdata, msg):
             # if MY_INTENSITY < value:
             MY_INTENSITY = value
             ORDERING_RSU_ID = message["station_id"]
-            print(colored("Intensity received: ", "yellow"), colored(MY_INTENSITY, "yellow"))
+            # print(colored("Intensity received: ", "yellow"), colored(MY_INTENSITY, "yellow"))
 
 def on_messageObu(client, userdata, msg):
     global MY_STATUS, MY_INTENSITY, BIAS, IN_RANGE, OBUS, IN_RANGES
@@ -117,7 +112,7 @@ def on_messageObu(client, userdata, msg):
         IN_RANGE = True
 
     if(distance_between_car_and_post > RADIUS):
-        # print(colored("Distance is: ", "red"), colored(distance_between_car_and_post, "red"))
+        print(colored("Distance is: ", "red"), colored(distance_between_car_and_post, "red"))
         return
 
     if(obu_id not in OBUS):
@@ -149,12 +144,11 @@ def on_messageObu(client, userdata, msg):
     time_to_arrival = [round(calc_interval(closest_distance, speed),2)]
     iluminacao = calc_iluminacao(closest_distance,speed, BIAS, facing)
     MY_INTENSITY = iluminacao
-    print(colored("Time to arrival: ", "green"), time_to_arrival)
-    print(colored("Distance between car and post: ","blue"), closest_distance)
-    # print(colored("Not facing post: ", "blue"), facing)
-    print(colored("Speed: ", "blue"), speed)
-    print(colored("Iluminacao: ", "yellow"), colored(iluminacao, "yellow"))  
-    print("\n")
+    # print(colored("Time to arrival: ", "green"), time_to_arrival)
+    # print(colored("Distance between car and post: ","blue"), closest_distance)
+    # print(colored("Speed: ", "blue"), speed)
+    # print(colored("Iluminacao: ", "yellow"), colored(iluminacao, "yellow"))  
+    # print("\n")
 
     
     times = get_times_to_arrival(True)
@@ -164,7 +158,7 @@ def on_messageObu(client, userdata, msg):
     
 def publish_lsm(message):
     clientRsu.publish("all/lsm", message) #lsm = light support message
-    print(message)
+    # print(message)
     print("LSM published on all/lsm")
 
 def publish_status(intensity, in_range, ordering_rsu_id):
@@ -237,7 +231,7 @@ def construct_message(destination, intensity, intensities, latitude, longitude, 
 #     return ids
 
 def get_times_to_arrival(in_range):
-    global LAMPS, OBUS, RADIUS
+    global LAMPS, OBUS, RADIUS, POST_RANGE
     #for all the LAMPS, calculate the time to arrival of the closest obu
     times = {}
     for key, value in LAMPS.items():
@@ -245,19 +239,18 @@ def get_times_to_arrival(in_range):
         lon = value['longitude']
         distance_val, obu_id = get_closest_obu(OBUS, lat, lon)
         difference_between_posts = round(distance((lat, lon), (post.x, post.y)).meters,2)
-        if difference_between_posts < RADIUS*1.8:
+        if difference_between_posts < POST_RANGE:
             if(in_range):
                 time_to_arrival = round(calc_interval(distance_val, OBUS[obu_id]["speed"]),2)
                 times[key] = time_to_arrival
             else:
                 times[key] = -1
-    print(times)
+    # print(times)
     return times
 
 def intensity_on_time(tempo, facing, bias):
-    # if(not facing and HIGHWAY):
-    #    bias = 0.5
-    # print(colored("Bias: ", "yellow"), colored(bias, "yellow"))
+    if tempo == -1 or tempo == 0:
+        return -1
     luminosidade = 1/tempo*100*bias
 
     if luminosidade > 100:

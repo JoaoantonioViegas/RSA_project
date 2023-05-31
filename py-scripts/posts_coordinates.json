@@ -119,20 +119,20 @@
 
     
     "19": {
-        "latitude": 40.640030, 
-        "longitude": -8.663484,
+        "latitude": 40.640266, 
+        "longitude": -8.663235,
         "status": "On",
         "rsu": true
     },
     "20": {
-        "latitude": 40.640461,  
-        "longitude": -8.662969 ,
+        "latitude": 40.640589,
+        "longitude":  -8.662760 ,
         "status": "On",
         "rsu": false
     },
     "21": {
-        "latitude": 40.640893,   
-        "longitude":  -8.662422 ,
+        "latitude": 40.640974, 
+        "longitude":  -8.662274 ,
         "status": "On",
         "rsu": false
     },
@@ -175,6 +175,68 @@
     "28": {
         "latitude": 40.643487,   
         "longitude": -8.658731 ,
+        "status": "On",
+        "rsu": true
+    },
+
+    
+    "29": {
+        "latitude": 40.637581, 
+        "longitude": -8.646957 ,
+        "status": "On",
+        "rsu": false
+    },
+    "30": {
+        "latitude": 40.638147, 
+        "longitude":-8.646200 ,
+        "status": "On",
+        "rsu": true
+    },
+    "31": {
+        "latitude": 40.638096,
+        "longitude": -8.646072,
+        "status": "On",
+        "rsu": false
+    },
+    "32": {
+        "latitude": 40.638550, 
+        "longitude": -8.646474,
+        "status": "On",
+        "rsu": false
+    },
+    "33": {
+        "latitude": 40.639000, 
+        "longitude": -8.647040, 
+        "status": "On",
+        "rsu": false
+    },
+    "34": {
+        "latitude": 40.639317,
+        "longitude":  -8.647598, 
+        "status": "On",
+        "rsu": true
+    },
+    "35": {
+        "latitude": 40.639903, 
+        "longitude":  -8.648805,
+        "status": "On",
+        "rsu": false
+    },
+    "36": {
+        "latitude": 40.639464, 
+        "longitude":  -8.649411,
+        "status": "On",
+        "rsu": true
+    },
+    "37": {
+        "latitude": 40.639051, 
+        "longitude":  -8.649076,
+        "status": "On",
+        "rsu": false
+    },
+    "38": {
+        "latitude": 40.638688,
+        "longitude":   -8.648470,
         "status": "On",
         "rsu": true
     }

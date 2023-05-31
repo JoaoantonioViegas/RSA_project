@@ -4,14 +4,25 @@
 import paho.mqtt.client as mqtt
 import time
 import json
-import random
+import sys
 from geopy.distance import distance, geodesic
 from geopy import Point
 import math
 from termcolor import colored
 import threading
 
-ID=3
+#make sure the program is called with the correct number of arguments (6)
+if len(sys.argv) != 4:
+    print("Usage: python3 RSU.py <ID> <IP> <path>")
+    sys.exit(1)
+
+#assign the arguments to variables
+ID = int(sys.argv[1])
+print(colored("ID: ", "magenta"), colored(ID, "magenta"))
+IP = sys.argv[2]
+print(colored("IP: ", "magenta"), colored(IP, "magenta"))
+PATH = int(sys.argv[3])
+print(colored("PATH: ", "magenta"), colored(PATH, "magenta"))
 
 def calculate_initial_compass_bearing(pointA, pointB):
     """
@@ -88,13 +99,6 @@ def travel(street_list, speed_list, delay):
         print("\n")
 
 
-client = mqtt.Client()
-# client.on_connect = on_connect
-# client.on_message = on_message
-client.connect("192.168.98.13", 1883, 60)
-
-threading.Thread(target=client.loop_forever).start()
-
 # create a function that will publish the message to the broker mosquitto_pub -h 192.168.98.1 -t "vanetza/in/cam" -m "message"
 def publish_message(message):
     client.publish("vanetza/in/cam", message)
@@ -114,6 +118,12 @@ def construct_message(latitude,longtitude, speed):
 #street = [(start.x, start.y), (end.x, end.y), speed in km/h]
 
 av_25_abril_1 = [(40.638049, -8.649238), (40.636935, -8.647825), 55]
+r_neves = [(40.636935, -8.647825), (40.638158, -8.646112), 50]
+r_moniz = [(40.638158, -8.646112), (40.639351, -8.647502), 60]
+r_moniz_2 = [(40.639351, -8.647502), (40.639959, -8.648803), 40]
+r_moniz_3 = [(40.639959, -8.648803), (40.639481, -8.649500), 40]
+r_passos = [(40.639481, -8.649500), (40.638621, -8.648478), 50]
+r_garret = [(40.638621, -8.648478), (40.638049, -8.649238), 50]
 av_25_abril_1_r = [(40.636935, -8.647825), (40.638049, -8.649238), 55]
 av_25_abril_half = [(40.637536, -8.648598), (40.638049, -8.649238), 55]
 av_25_abril_2 = [(40.636935, -8.647825), (40.636039, -8.646736), 50]
@@ -138,7 +148,21 @@ r_tv_martinho_2_r = [(40.637797, -8.649554), (40.637514, -8.649407), 30]
 r_tv_martinho_3 = [(40.637797, -8.649554), (40.638049, -8.649238), 30]
 r_tv_martinho_3_r = [(40.638049, -8.649238), (40.637797, -8.649554), 30]
 r_infante = [(40.637096, -8.649153), (40.637534, -8.648609), 30]
+A25_1 = [(40.636800, -8.667729),(40.639178, -8.664639),100]
+A25_2 = [(40.639178, -8.664639),(40.642825, -8.659768),110]
+A25_3 = [(40.642825, -8.659768),(40.646065, -8.654425),120]
+A25_1_r = [(40.639178, -8.664639),(40.636800, -8.667729),100]
+A25_2_r = [(40.642825, -8.659768),(40.639178, -8.664639),110]
+A25_3_r = [(40.646065, -8.654425),(40.642825, -8.659768),120]
 
+
+r_tv_martinho_3_street = coordinates_to_dict(get_coordinates(r_tv_martinho_3[0][0], r_tv_martinho_3[0][1], r_tv_martinho_3[1][0], r_tv_martinho_3[1][1], r_tv_martinho_3[2]))
+A25_1_r_street = coordinates_to_dict(get_coordinates(A25_1_r[0][0], A25_1_r[0][1], A25_1_r[1][0], A25_1_r[1][1], A25_1_r[2]))
+A25_2_r_street = coordinates_to_dict(get_coordinates(A25_2_r[0][0], A25_2_r[0][1], A25_2_r[1][0], A25_2_r[1][1], A25_2_r[2]))
+A25_3_r_street = coordinates_to_dict(get_coordinates(A25_3_r[0][0], A25_3_r[0][1], A25_3_r[1][0], A25_3_r[1][1], A25_3_r[2]))
+A25_1_street = coordinates_to_dict(get_coordinates(A25_1[0][0], A25_1[0][1], A25_1[1][0], A25_1[1][1], A25_1[2]))
+A25_2_street = coordinates_to_dict(get_coordinates(A25_2[0][0], A25_2[0][1], A25_2[1][0], A25_2[1][1], A25_2[2]))
+A25_3_street = coordinates_to_dict(get_coordinates(A25_3[0][0], A25_3[0][1], A25_3[1][0], A25_3[1][1], A25_3[2]))
 av_25_abril_1_street = coordinates_to_dict(get_coordinates(av_25_abril_1[0][0], av_25_abril_1[0][1], av_25_abril_1[1][0], av_25_abril_1[1][1], av_25_abril_1[2]))
 av_25_abril_1_r_street = coordinates_to_dict(get_coordinates(av_25_abril_1_r[0][0], av_25_abril_1_r[0][1], av_25_abril_1_r[1][0], av_25_abril_1_r[1][1], av_25_abril_1_r[2]))
 av_25_abril_half_street = coordinates_to_dict(get_coordinates(av_25_abril_half[0][0], av_25_abril_half[0][1], av_25_abril_half[1][0], av_25_abril_half[1][1], av_25_abril_half[2]))
@@ -161,22 +185,50 @@ r_tv_martinho_1_street = coordinates_to_dict(get_coordinates(r_tv_martinho_1[0][
 r_tv_martinho_1_r_street = coordinates_to_dict(get_coordinates(r_tv_martinho_1_r[0][0], r_tv_martinho_1_r[0][1], r_tv_martinho_1_r[1][0], r_tv_martinho_1_r[1][1], r_tv_martinho_1_r[2]))
 r_tv_martinho_2_street = coordinates_to_dict(get_coordinates(r_tv_martinho_2[0][0], r_tv_martinho_2[0][1], r_tv_martinho_2[1][0], r_tv_martinho_2[1][1], r_tv_martinho_2[2]))
 r_tv_martinho_2_r_street = coordinates_to_dict(get_coordinates(r_tv_martinho_2_r[0][0], r_tv_martinho_2_r[0][1], r_tv_martinho_2_r[1][0], r_tv_martinho_2_r[1][1], r_tv_martinho_2_r[2]))
-r_tv_martinho_3_street = coordinates_to_dict(get_coordinates(r_tv_martinho_3[0][0], r_tv_martinho_3[0][1], r_tv_martinho_3[1][0], r_tv_martinho_3[1][1], r_tv_martinho_3[2]))
 r_tv_martinho_3_r_street = coordinates_to_dict(get_coordinates(r_tv_martinho_3_r[0][0], r_tv_martinho_3_r[0][1], r_tv_martinho_3_r[1][0], r_tv_martinho_3_r[1][1], r_tv_martinho_3_r[2]))
 r_infante_street = coordinates_to_dict(get_coordinates(r_infante[0][0], r_infante[0][1], r_infante[1][0], r_infante[1][1], r_infante[2]))
+r_neves_street = coordinates_to_dict(get_coordinates(r_neves[0][0], r_neves[0][1], r_neves[1][0], r_neves[1][1], r_neves[2]))
+r_moniz_street = coordinates_to_dict(get_coordinates(r_moniz[0][0], r_moniz[0][1], r_moniz[1][0], r_moniz[1][1], r_moniz[2]))
+r_moniz_2_street = coordinates_to_dict(get_coordinates(r_moniz_2[0][0], r_moniz_2[0][1], r_moniz_2[1][0], r_moniz_2[1][1], r_moniz_2[2]))
+r_moniz_3_street = coordinates_to_dict(get_coordinates(r_moniz_3[0][0], r_moniz_3[0][1], r_moniz_3[1][0], r_moniz_3[1][1], r_moniz_3[2]))
+r_passos_street = coordinates_to_dict(get_coordinates(r_passos[0][0], r_passos[0][1], r_passos[1][0], r_passos[1][1], r_passos[2]))
+r_garret_street = coordinates_to_dict(get_coordinates(r_garret[0][0], r_garret[0][1], r_garret[1][0], r_garret[1][1], r_garret[2]))
+
 
 # create a main function that will run the program
 def main():
-    # path = [av_25_abril_1_street, av_25_abril_2_street, av_oita_2_street,  r_martinho_1_street, r_martinho_2_street, r_tv_martinho_1_street, r_tv_martinho_2_street, r_tv_martinho_3_street]
-    path = [av_25_abril_2_r_street,r_neves_2_street, r_martinho_2_half_street, r_infante_street, \
+    global PATH
+    if PATH == 1:
+        path = [av_25_abril_1_street, av_25_abril_2_street, av_oita_2_street,  r_martinho_1_street, r_martinho_2_street, \
+            r_tv_martinho_1_street, r_tv_martinho_2_street, r_tv_martinho_3_street]
+        speed = [55, 50, 45, 30, 30, 30, 30, 30]
+    elif PATH == 2:
+        path = [A25_1_street, A25_2_street, A25_3_street]
+        speed = [100, 110, 120]
+    elif PATH == 3:
+        path = [av_25_abril_2_r_street,r_neves_2_street, r_martinho_2_half_street, r_infante_street, \
             av_25_abril_half_street, r_tv_martinho_3_r_street, r_tv_martinho_2_r_street, r_tv_martinho_1_r_street, \
             r_martinho_2_r_street, r_martinho_1_r_street, av_oita_2_r_street]
-    speed = [50, 30, 30, 30, 55, 30, 30, 30, 50, 50, 50]
+        speed = [50, 30, 30, 30, 55, 30, 30, 30, 50, 50, 50]
+    elif PATH == 4:
+        path = [av_25_abril_1_street,r_neves_street, r_moniz_street, r_moniz_2_street, \
+            r_moniz_3_street, r_passos_street, r_garret_street,]
+        speed = [55, 50, 60, 40, 40, 50, 50]
+    elif PATH == 5:
+        path = [A25_3_r_street, A25_2_r_street, A25_1_r_street]
+        speed = [100, 110, 120]
+    else:
+        print("Invalid path")
+    
+    if PATH == 4:
+            time.sleep(1)
     while True:
-        #main street with average speed of 50km/h and resolution of 10Hz
         travel(path, speed, 0.1)
-        # time.sleep(3)
 
+client = mqtt.Client()
+client.connect(IP, 1883, 60)
+
+threading.Thread(target=client.loop_forever).start()
 
 if __name__ == "__main__":
     main()

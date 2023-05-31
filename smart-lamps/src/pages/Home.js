@@ -19,16 +19,16 @@ const CustomToast = ({ content, description }) => (
 function Home() {
 
   const [obuData, setObuData] = useState({})
-  const [speed, setSpeed] = useState(0)
+  // const [speed, setSpeed] = useState(0)
   const [lampData, setLampData] = useState({})
   const [rsuRanges, setRsuRanges] = useState({})
   const [showHighwayInfo, setShowHighwayInfo] = useState(true)
 
   const circleRadius = 100; // meters
-  const circleColor = 'red';
-  const rsuCircleRadius = 150;
-  const rsuCircleColor = 'green';
-  const circleOpacity = 0.2;
+  const circleColor = 'green';
+  // const rsuCircleRadius = 150;
+  // const rsuCircleColor = 'green';
+  const circleOpacity = 0.08;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,7 +66,7 @@ function Home() {
         prev_in_range = rsuRanges[key]
       }
       if (prev_in_range === false && in_range === true) {
-        let rsu_alerted = lampData[key].target_posts
+        let rsu_alerted = Object.keys(lampData[key].target_posts)
         let rsu_alerted_str = rsu_alerted.join(', ')
         const highway_keys = ['19', '22', '25', '28']
         console.log(highway_keys.includes(key))

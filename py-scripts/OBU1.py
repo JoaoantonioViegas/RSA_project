@@ -143,7 +143,8 @@ r_tv_martinho_3_street = coordinates_to_dict(get_coordinates(r_tv_martinho_3[0][
 
 # create a main function that will run the program
 def main():
-    path = [av_25_abril_1_street, av_25_abril_2_street, av_oita_2_street,  r_martinho_1_street, r_martinho_2_street, r_tv_martinho_1_street, r_tv_martinho_2_street, r_tv_martinho_3_street]
+    path = [av_25_abril_1_street, av_25_abril_2_street, av_oita_2_street,  r_martinho_1_street, r_martinho_2_street, \
+            r_tv_martinho_1_street, r_tv_martinho_2_street, r_tv_martinho_3_street]
     speed = [55, 50, 45, 30, 30, 30, 30, 30]
     while True:
         #main street with average speed of 50km/h and resolution of 10Hz
